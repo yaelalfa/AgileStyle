@@ -75,7 +75,11 @@ class main:
             )
             self.classname.set(c.fetchone()[0])
             self.show_Manger_frame()
-       
+        elif role == Developer:
+            self.setup_dev()
+            self.show_parent_dev()
+            # show parents frame
+            pass
 
     
     # Frame Packing Methords
