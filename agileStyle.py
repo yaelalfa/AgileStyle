@@ -5,7 +5,7 @@ import sqlite3
 
 from typing import List, Any
 
-from PIL import ImageTk, Image
+
 
 from docx import Document
 from docx.shared import Inches
@@ -17,9 +17,6 @@ users = sqlite3.connect("users.db")
 
 
 #users.cursor().execute("drop table users")
-#images.cursor().execute("drop table images")
-#stories.cursor().execute("drop table stories")
-
 
 users.cursor().execute(
     "CREATE TABLE IF NOT EXISTS users (username TEXT PRIMARY KEY ,password TEXT, role TEXT)"
@@ -62,7 +59,7 @@ class main:
         c.execute(find_user, [(self.username.get()), (self.password.get())])
         result = c.fetchone()
         if not result:
-            ms.showerror("ΰει", "ων δξωϊξω ΰε δριρξΰ μΰ ϊχιπιν")
+            ms.showerror("ΧΧ•Χ™", "Χ©Χ Χ”ΧΧ©ΧªΧΧ© ΧΧ• Χ”Χ΅Χ™Χ΅ΧΧ ΧΧ ΧªΧ§Χ™Χ Χ™Χ")
             return
         self.logf.pack_forget()
         # self.head['text'] = f'Logged In As\n {self.username.get()}'
@@ -80,7 +77,15 @@ class main:
             self.show_parent_dev()
             # show parents frame
             pass
-
+        elif role == Custumer:
+            c.execute(
+                "SELECT class FROM users WHERE username=?", (self.username.get(),)
+            )
+            self.classname.set(c.fetchone()[0])
+            self.show_Custumer_frame()
+        else:
+            print(f"ΧΧ ΧΧ›Χ™Χ¨ ΧΧª Χ”ΧªΧ¤Χ§Χ™Χ“ {username} - {role}")
+            return
     
     # Frame Packing Methords
     def login_frame(self):
@@ -88,7 +93,7 @@ class main:
         self.password.set("")
         self.crf.pack_forget()
         self.teacher_frame.pack_forget()
-        self.head["text"] = "δϊηαψεϊ"
+        self.head["text"] = "Χ”ΧªΧ—Χ‘Χ¨Χ•Χª"
         self.logf.pack()
 
 
