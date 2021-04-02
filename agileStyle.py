@@ -100,7 +100,7 @@ def new_user(self):
         #     ms.showerror("Error!", "Username Taken Try a Diffrent One.")
         #     return
 
-        if self.n_role.get() not in [Custumer, Maneger]:
+        if self.n_role.get() not in [Custumer, Maneger, Developer]:
             ms.showerror(
                 "תקלה!",
                 f"התפקיד {self.n_role.get()} לא קיים",
@@ -137,4 +137,10 @@ def new_user(self):
         self.head["text"] = "התחברות"
         self.logf.pack()
 
-
+def create_acc_frame(self):
+        self.n_username.set("")
+        self.n_password.set("")
+        self.logf.pack_forget()
+        self.logf.pack_forget()
+        self.head["text"] = "יצירת משתמש"
+        self.crf.pack()
