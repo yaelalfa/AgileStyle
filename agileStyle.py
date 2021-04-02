@@ -100,7 +100,7 @@ def new_user(self):
         #     ms.showerror("Error!", "Username Taken Try a Diffrent One.")
         #     return
 
-        if self.n_role.get() not in [Custumer]:
+        if self.n_role.get() not in [Custumer, Maneger]:
             ms.showerror(
                 "תקלה!",
                 f"התפקיד {self.n_role.get()} לא קיים",
