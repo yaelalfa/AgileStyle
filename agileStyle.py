@@ -5,29 +5,24 @@ import sqlite3
 
 from typing import List, Any
 
-
-
-from docx import Document
-from docx.shared import Inches
+# from docx import Document
+# from docx.shared import Inches
 
 import os
+
 # make database and users (if not exists already) table at programme start up
 users = sqlite3.connect("users.db")
 
-
-
-#users.cursor().execute("drop table users")
+# users.cursor().execute("drop table users")
 
 users.cursor().execute(
     "CREATE TABLE IF NOT EXISTS users (username TEXT PRIMARY KEY ,password TEXT, role TEXT)"
 )
 
- 
-
 print(
     users.cursor()
-    .execute("SELECT username, role FROM users")
-    .fetchall()
+        .execute("SELECT username, role FROM users")
+        .fetchall()
 )
 
 Maneger = "maneger"
@@ -52,6 +47,8 @@ class main:
         self.n_password = StringVar()
         self.n_role = StringVar()
         self.classname = StringVar()
+        self.resetPass = StringVar()
+        self.findName = StringVar()
         self.widgets()
 
     # Login Function
@@ -70,50 +67,61 @@ class main:
         # self.head['text'] = f'Logged In As\n {self.username.get()}'
         # self.head['pady'] = 150
         username = result[0]
-        role: str = result[3].lower()
+        role: str = result[2].lower()
         if role == Maneger:
             c.execute(
                 "SELECT class FROM users WHERE username=?", (self.username.get(),)
             )
-            #SHOW MANAGER FRAME
+            self.maneger_frame()
         elif role == Developer:
-            # show DEV frame
             print("true")
+            self.developer_frame()
             pass
         elif role == Custumer:
             c.execute(
                 "SELECT class FROM users WHERE username=?", (self.username.get(),)
             )
-            #show costomer frame
+            self.custumer_frame()
         else:
             print(f"לא מכיר את התפקיד {username} - {role}")
             return
 
+    def forgot_password(self):
+        c = self.users_db.cursor()
+        find_user = "SELECT * FROM users WHERE username = ? "
+        c.execute(find_user, [(self.findName.get())])
+        result = c.fetchone()
+        if not result:
+            ms.showerror("אוי", "שם המשתמש לא קיים")
+            return
+        update = """UPDATE users set password = ? where username = ?"""
+        c.execute(update, [self.resetPass.get(), self.findName.get()])
+        self.users_db.commit()
+        self.login_frame()
 
     def new_user(self):
-            # Establish Connection
-            users_cursor = self.users_db.cursor()
-       
+        # Establish Connection
+        users_cursor = self.users_db.cursor()
 
-            # Find Existing username if any take proper action
-            # find_user = "SELECT * FROM users WHERE username = ?"
-            # users_cursor.execute(find_user, [(self.username.get())])
-            # if users_cursor.fetchall():
-            #     ms.showerror("Error!", "Username Taken Try a Diffrent One.")
-            #     return
+        # Find Existing username if any take proper action
+        # find_user = "SELECT * FROM users WHERE username = ?"
+        # users_cursor.execute(find_user, [(self.username.get())])
+        # if users_cursor.fetchall():
+        #     ms.showerror("Error!", "Username Taken Try a Diffrent One.")
+        #     return
 
-            if self.n_role.get() not in [Custumer, Maneger, Developer]:
-                ms.showerror(
-                    "תקלה!",
-                    f"התפקיד {self.n_role.get()} לא קיים",
-                )
-                return
+        if self.n_role.get() not in [Custumer, Maneger, Developer]:
+            ms.showerror(
+                "תקלה!",
+                f"התפקיד {self.n_role.get()} לא קיים",
+            )
+            return
 
-            # Create New Account
-            insert_users = "INSERT INTO users(username, password, role) VALUES(?,?,?)"
-        
-            try:
-                users_cursor.execute(
+        # Create New Account
+        insert_users = "INSERT INTO users(username, password, role) VALUES(?,?,?)"
+
+        try:
+            users_cursor.execute(
                 insert_users,
                 [
                     (self.n_username.get()),
@@ -121,21 +129,19 @@ class main:
                     self.n_role.get().lower(),
                 ],
             )
-            except Exception:
-                return ms.showerror("!תקלה", "שם המשתמש קיים")
-        
-       
-            self.users_db.commit()
-            ms.showinfo("בוצע", "המשתמש נוצר בהצלחה")
-            self.login_frame()
+        except Exception:
+            return ms.showerror("!תקלה", "שם המשתמש קיים")
 
-        
+        self.users_db.commit()
+        ms.showinfo("בוצע", "המשתמש נוצר בהצלחה")
+        self.login_frame()
+
     # Frame Packing Methords
     def login_frame(self):
         self.username.set("")
         self.password.set("")
         self.crf.pack_forget()
-        
+        self.fpf.pack_forget()
         self.head["text"] = "התחברות"
         self.logf.pack()
 
@@ -146,11 +152,42 @@ class main:
         self.logf.pack_forget()
         self.head["text"] = "יצירת משתמש"
         self.crf.pack()
-        # Draw Widgets
+
+    def forgot_password_frame(self):
+        self.findName.set("")
+        self.resetPass.set("")
+        self.logf.pack_forget()
+        self.crf.pack_forget()
+        self.head["text"] = "שחזור סיסמא"
+        self.fpf.pack()
+
+    def developer_frame(self):
+        self.logf.pack_forget()
+        self.head["text"] = "מפתח"
+        self.df.pack()
+
+    def maneger_frame(self):
+        self.logf.pack_forget()
+        self.head["text"] = "מנהל"
+        self.df.pack()
+
+    def custumer_frame(self):
+        self.logf.pack_forget()
+        self.head["text"] = "לקוח"
+        self.df.pack()
+
+    ## DRAW WIDGETS ##
     def widgets(self):
+
+        # Login widgets
+
         self.head = Label(self.master, text="התחברות", font=("", 35), pady=10)
         self.head.pack()
         self.logf = Frame(self.master, padx=10, pady=10)
+        self.fpf = Frame(self.master, padx=10, pady=10)
+
+        self.mf = Frame(self.master, padx=20, pady=30)
+        self.cf = Frame(self.master, padx=20, pady=30)
         Label(self.logf, text="שם משתמש: ", font=("", 20), pady=5, padx=5).grid(
             sticky=W
         )
@@ -165,13 +202,22 @@ class main:
         ).grid(row=1, column=1)
         Button(
             self.logf,
+            text=" שכחת סיסמא? ",
+            bd=3,
+            font=("", 15),
+            padx=1,
+            pady=1,
+            command=self.forgot_password_frame,
+        ).grid()
+        Button(
+            self.logf,
             text=" התחברות ",
             bd=3,
             font=("", 15),
             padx=5,
             pady=5,
             command=self.login,
-            ).grid()
+        ).grid(row=2, column=1)
         Button(
             self.logf,
             text=" יצירת משתמש ",
@@ -180,8 +226,10 @@ class main:
             padx=5,
             pady=5,
             command=self.create_acc_frame,
-        ).grid(row=2, column=1)
+        ).grid(row=2, column=2)
         self.logf.pack()
+
+        # NewUser widgets
 
         self.crf = Frame(self.master, padx=10, pady=10)
         Label(self.crf, text="שם משתמש: ", font=("", 20), pady=10, padx=10).grid(
@@ -198,7 +246,6 @@ class main:
         Entry(self.crf, textvariable=self.n_role, bd=5, font=("", 15)).grid(
             row=2, column=1
         )
-        
         Button(
             self.crf,
             text=" יצירת משתמש ",
@@ -217,7 +264,47 @@ class main:
             pady=5,
             command=self.login_frame,
         ).grid(row=4, column=1)
+
+        # Forgot password widgets
+        Label(self.fpf, text="שם משתמש: ", font=("", 20), pady=10, padx=10).grid(
+            sticky=W
+        )
+        Entry(self.fpf, textvariable=self.findName, bd=5, font=("", 15)).grid(
+            row=0, column=1
+        )
+        Label(self.fpf, text="סיסמא חדשה: ", font=("", 20), pady=5, padx=5).grid(sticky=W)
+        Entry(
+            self.fpf, textvariable=self.resetPass, bd=5, font=("", 15), show="*"
+        ).grid(row=1, column=1)
+        Button(
+            self.fpf,
+            text=" אפס סיסמא",
+            bd=3,
+            font=("", 15),
+            padx=5,
+            pady=5,
+            command=self.forgot_password,
+        ).grid()
+        Button(
+            self.fpf,
+            text="חזור להתחברות ",
+            bd=3,
+            font=("", 15),
+            padx=5,
+            pady=5,
+            command=self.login_frame,
+        ).grid(row=2, column=1)
+
+        # Developer Widgets
+        self.df = Frame(self.master, padx=20, pady=30)
+
+        # Manager Widgets
+        self.mf = Frame(self.master, padx=20, pady=30)
+
+        # Customer Widgets
+        self.cf = Frame(self.master, padx=20, pady=30)
+
+
 root = Tk()
 main(root)
 root.mainloop()
-
