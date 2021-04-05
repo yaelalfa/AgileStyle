@@ -8,31 +8,31 @@ pipeline {
                 }
             }
             steps {
+                echo 'running build stage'
                 sh 'python -m py_compile agileStyle.py'
             }
         }
         //NEED TO ADD UNITTEST FILE 
-      /*  stage('Test') {
+        stage('Test') {
             agent {
                 docker {
                     image 'qnib/pytest'
                 }
             }
             steps {
-                sh 'py.test --verbose --junit-xml test-reports/results.xml sources/test_calc.py'
+                echo 'running test stage'
+               /* sh 'py.test --verbose --junit-xml test-reports/results.xml sources/test_calc.py'*/
             }
-            post {
+           /* post {
                 always {
                     junit 'test-reports/results.xml'
-                }
+                }*/
             }
-        }*/
+        }
         
-        stage('Deliver') {
+        stage('Deploy') {
                     agent any
-                    environment {
-                        VOLUME = '$(pwd)/sources:/src'
-                        IMAGE = 'cdrx/pyinstaller-linux:python2'
+                    
                     }
                     steps {
                         dir(path: env.BUILD_ID) {
@@ -47,6 +47,13 @@ pipeline {
                         }
                     }
         }
-        
+        post{
+              success{
+                   echo "==pipeline execution successfully==" 
+               }
+               failure{
+                    echo "==pipeline execution failed=="
+                }
+         }   
     }
 }
