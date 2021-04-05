@@ -70,7 +70,7 @@ class main:
         role: str = result[2].lower()
         if role == Maneger:
             c.execute(
-                "SELECT class FROM users WHERE username=?", (self.username.get(),)
+                "SELECT username FROM users WHERE username=?", (self.username.get(),)
             )
             self.maneger_frame()
         elif role == Developer:
@@ -79,7 +79,7 @@ class main:
             pass
         elif role == Custumer:
             c.execute(
-                "SELECT class FROM users WHERE username=?", (self.username.get(),)
+                "SELECT username FROM users WHERE username=?", (self.username.get(),)
             )
             self.custumer_frame()
         else:
