@@ -91,7 +91,7 @@ class main:
             )
             self.custumer_frame()
         else:
-           # print(f"לא מכיר את התפקיד {username} - {role}")
+            print("לא מכיר את התפקיד {username} - {role}")
             return
 
     def forgot_password(self):
@@ -121,7 +121,7 @@ class main:
         if self.n_role.get() not in [Custumer, Maneger, Developer]:
             ms.showerror(
                 "תקלה!",
-                f"התפקיד {self.n_role.get()} לא קיים",
+                "התפקיד {self.n_role.get()} לא קיים",
             )
             return
 
