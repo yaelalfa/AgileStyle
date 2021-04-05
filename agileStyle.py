@@ -2,6 +2,10 @@ from tkinter import *
 from tkinter import messagebox as ms
 
 import sqlite3
+import proj_editor as PA
+import task_editor as TA
+
+
 
 from typing import List, Any
 
@@ -31,6 +35,10 @@ Custumer = "customer"
 
 imgs = {}
 
+def open_task_fram():
+    TA.creat_task_fram()
+def open_proj_fram():
+    PA.menu()
 
 # main Class
 class main:
