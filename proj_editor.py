@@ -21,6 +21,7 @@ conn.commit()
 conn.close()
 
 root = tk.Tk()
+root.withdraw()
 name_var = tk.StringVar()
 pId_var = tk.StringVar()
 mId_var = tk.StringVar()
@@ -92,6 +93,7 @@ def remove_proj_frame():
 
 
 def menu():
+    root.deiconify()
     root.title("project editor")
     head = Label(root, text="ניהול פרויקט", font=("", 35), pady=10)
     head.pack()
@@ -102,5 +104,5 @@ def menu():
     root.mainloop()
 
 
-menu()
+
 
