@@ -21,13 +21,28 @@ pipeline {
             }
             steps {
                 echo 'running test stage'
-                
+                sh 'py.test --verbose --junit-xml test-reports/results.xml sources/test_calc.py'
             }
             post {
                 always {
                     junit 'test-reports/results.xml'
                 }
             }
+        }
+        stage('Deploy') {
+            agent {
+                docker {
+                    image 'qnib/pytest'
+                }
+            }
+            steps {
+                script{
+                    sh "chmod +x ./deploy.sh"
+                    sh "./deploy.sh"
+                }
+            }
+         
+          }
         }      
     }
 }

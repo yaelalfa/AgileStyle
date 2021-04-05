@@ -75,7 +75,7 @@ class main:
         # self.head['text'] = f'Logged In As\n {self.username.get()}'
         # self.head['pady'] = 150
         username = result[0]
-        role: str = result[2].lower()
+        role = result[2].lower()
         if role == Maneger:
             c.execute(
                 "SELECT username FROM users WHERE username=?", (self.username.get(),)
