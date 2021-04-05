@@ -30,19 +30,18 @@ pipeline {
             }
         }
         stage('Deploy') {
-            agent {
-                docker {
-                    image 'qnib/pytest'
-                }
-            }
-            steps {
-                script{
-                    sh "chmod +x ./deploy.sh"
-                    sh "./deploy.sh"
-                }
-            }
-         
-        }
+               agent {
+                   docker {
+                       reuseNode true
+                       image ‘nginx’
+                   }
+               }
+               steps {
+                    echo "Docker Created"
+                     }
+         }
+                           
+                           
     }      
     
 }
