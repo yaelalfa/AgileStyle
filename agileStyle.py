@@ -91,7 +91,7 @@ class main:
             )
             self.custumer_frame()
         else:
-            print(f"לא מכיר את התפקיד {username} - {role}")
+           # print(f"לא מכיר את התפקיד {username} - {role}")
             return
 
     def forgot_password(self):
