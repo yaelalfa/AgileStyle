@@ -37,8 +37,8 @@ imgs = {}
 
 def open_task_fram():
     TA.creat_task_fram()
-def open_proj_fram():
-    PA.menu()
+def open_proj_fram(username):
+    PA.menu(username)
 
 # main Class
 class main:

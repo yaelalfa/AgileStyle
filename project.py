@@ -45,9 +45,11 @@ class PROJECT:
         sql = """DELETE FROM projects 
                        WHERE projId=? 
 
-                        """
+           
+                       """
+        dt = (id,)
         try:
-            c.execute(sql, (id))
+            c.execute(sql, dt)
             ms.showinfo("נמחק פרויקט: " + id)
 
         except Exception:
@@ -58,6 +60,7 @@ class PROJECT:
     @classmethod
     def printAll(cls):
 
+        print("projects: ")
         conn = sqlite3.connect('myDb.db')
         c = conn.cursor()
 
@@ -69,4 +72,31 @@ class PROJECT:
             print(row)
         conn.commit()
         conn.close()
+
+    @classmethod
+    def projectManager(cls,id):
+
+        print("select project manager by project id: "+id)
+
+
+        conn = sqlite3.connect('myDb.db')
+        c = conn.cursor()
+
+        sql ="""SELECT managerId 
+        FROM projects 
+        where projId=?         
+
+                        """
+        dt = (id,)
+        c.execute(sql,dt)
+        user = c.fetchone()
+        ru = user[0]
+
+
+
+        conn.commit()
+        conn.close()
+        return ru
+
+
 

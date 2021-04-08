@@ -44,6 +44,7 @@ def creat_proj_frame():
 
         PROJECT.printAll()
 
+
     # creating labels
     head = Label(creat, text="יצירת פקוירט חדש", font=("", 35), pady=10)
     head.grid(row=0, column=1)
@@ -68,15 +69,33 @@ def creat_proj_frame():
     creat.mainloop()
 
 
+def chekuser(pid):
+    global  us
+    pmanj=PROJECT.projectManager(pid)
+    return pmanj==us
+
+
 def remove_proj_frame():
+
+
     root.destroy()
     remove = tk.Tk()
     remove.title("remove project")
 
+
     def remove_proj():
         pId = pId_entry.get()
-        PROJECT.remove_by_id(pId)
+        #PROJECT.printAll()
+        if chekuser(pId) is True:
+            PROJECT.remove_by_id(pId)
+        else:
+            ms.showerror("only project mamager can erase project")
+
+
+
+
         remove.destroy()
+
 
     head = Label(remove, text="מחיקת פרויקט", font=("", 35), pady=10)
     head.grid(row=0, column=1)
@@ -92,7 +111,9 @@ def remove_proj_frame():
     remove.mainloop()
 
 
-def menu():
+def menu(username):
+    global us
+    us=username
     root.deiconify()
     root.title("project editor")
     head = Label(root, text="ניהול פרויקט", font=("", 35), pady=10)
@@ -102,7 +123,6 @@ def menu():
     removeproj = tk.Button(root, text="מחק פרויקט", padx=10, pady=10, command=remove_proj_frame)
     removeproj.pack()
     root.mainloop()
-
 
 
 
