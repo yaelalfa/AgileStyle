@@ -4,7 +4,7 @@ pipeline {
         stage('Build') {
             agent {
                 docker {
-                    image 'python:2-alpine'
+                    image 'python:3.5'
                 }
             }
             steps {
@@ -21,7 +21,7 @@ pipeline {
             }
             steps {
                 echo 'running test stage'
-                sh 'py.test --verbose --junit-xml test-reports/results.xml sources/AgileStyleTest.py'
+                sh 'pytest --verbose --junit-xml test-reports/results.xml sources/AgileStyleTest.py'
             }
             post {
                 always {
@@ -29,17 +29,6 @@ pipeline {
                 }
             }
         }
-        stage('Deploy') {
-               agent {
-                   docker {
-                       reuseNode true
-                       image ‘nginx’
-                   }
-               }
-               steps {
-                    echo "Docker Created"
-                     }
-         }
                            
                            
     }      
