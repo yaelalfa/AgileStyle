@@ -1,7 +1,9 @@
 from tkinter import *
 from tkinter import messagebox as ms
-import tkinter as tk
+
 import sqlite3
+import proj_editor as PA
+import task_editor as TA
 
 
 
@@ -33,164 +35,10 @@ Custumer = "customer"
 
 imgs = {}
 
-##########################################################################################
-# creat database if not exist and get conecction to it
-conect = sqlite3.connect('myDb.db')
-
-# get a cursor to execute sql statements
-cc = conect.cursor()
-
-# creat table
-sql = '''CREATE TABLE IF NOT EXISTS projects
-         (projId text PRIMARY KEY,
-          name text,
-          managerId text )'''
-cc.execute(sql)
-conect.commit()
-conect.close()
-
-##########################################################################################
-global flag1
-flag1=0
-global flag2
-flag2=0
-global flag3
-flag3=0
-global flag4
-flag4=0
-global flag5
-flag5=0
-
-#************project class**********************************#
-class PROJECT:
-    def __init__(self, projId, name, us):
-        self.projId = projId
-        self.name = name
-        self.user = us #usrename
-
-    def insert_to_table(self):
-        connect = sqlite3.connect('myDb.db')
-        cc = connect.cursor()
-        sql = '''INSERT INTO projects VALUES(?,?,?)
-        '''
-        dats_tuple = (self.projId, self.name, self.user)
-        try:
-            cc.execute(sql, dats_tuple)
-            ms.showinfo("פרויקט חדש נוצר בהצלחה")
-        except Exception:
-            ms.showerror("שגיאה!"," נסיון להכניס פרויקט חדש לטבלה נכשל")
-        connect.commit()
-        connect.close()
-
-    @classmethod
-    def printAll(cls):
-
-        print("projects: ")
-        connect = sqlite3.connect('myDb.db')
-        cc = connect.cursor()
-
-        sql = 'SELECT * FROM projects'
-        cc.execute(sql)
-        rows = cc.fetchall()
-
-        for row in rows:
-            print(row)
-        connect.commit()
-        connect.close()
-
-    @classmethod
-    def projectManager(cls, id):
-
-        print("select project manager by project id: " + id)
-
-        connect = sqlite3.connect('myDb.db')
-        cc = connect.cursor()
-
-        sql = """SELECT managerId 
-            FROM projects 
-            where projId=?         
-
-                            """
-        dt = (id,)
-        cc.execute(sql, dt)
-        user = cc.fetchone()
-
-        if not user:
-            ms.showerror("error", "project not exists")
-            return 0
-
-        ru = user[0]
-        return ru
-
-        connect.commit()
-        connect.close()
-
-    @classmethod
-    def remove_by_id(cls, id):
-        connect = sqlite3.connect('myDb.db')
-        cc = connect.cursor()
-        sql = """DELETE FROM projects 
-                           WHERE projId=? 
-
-
-                           """
-        dt = (id,)
-        try:
-            cc.execute(sql, dt)
-            ms.showinfo("בוצע","נמחק פרויקט: " + id)
-
-        except Exception:
-            ms.showerror("שגיאה","שגיאה בזמן מחיקץ פרויקט")
-        connect.commit()
-        connect.close()
-#*************end of project class**********************************#
-
-#**************task class*********************************#
-class TASK:
-    def __init__(self,taskId,time,crewN):
-        self.taskId=taskId
-        self.time=time
-        self.crewNum=crewN
-
-
-    def insert_to_table(self):
-        conect = sqlite3.connect('myDb.db')
-        cc = conect.cursor()
-        sql = '''INSERT INTO tasks VALUES(?,?,?)
-         '''
-        dats_tuple = (self.taskId,self.time,self.crewNum)
-
-        try:
-            cc.execute(sql, dats_tuple)
-            ms.showinfo("משימה חדשה נוצרה בהצלחה")
-
-        except Exception:
-            ms.showerror("שגיאה! נסיון להכניס משימה חדשה לטבלה נכשל")
-
-        conect.commit()
-        conect.close()
-
-    @classmethod
-    def printAll(cls):
-        connect= sqlite3.connect('myDb.db')
-        cc = conect.cursor()
-
-        sql = 'SELECT * FROM tasks'
-        cc.execute(sql)
-        rows = cc.fetchall()
-
-        for row in rows:
-            print(row)
-        conect.commit()
-        conect.close()
-
-#**************end of task class*********************************#
-
-
-
-
-
-
+def open_task_fram():
+    TA.creat_task_fram()
+def open_proj_fram(username):
+    PA.menu(username)
 
 # main Class
 class main:
@@ -210,11 +58,6 @@ class main:
         self.resetPass = StringVar()
         self.findName = StringVar()
         self.widgets()
-        self.prjNum=StringVar()
-        self.prjName = StringVar()
-        self.taskId=StringVar()
-        self.time=StringVar()
-        self.crew=StringVar()
 
     # Login Function
     def login(self):
@@ -275,7 +118,6 @@ class main:
         #     ms.showerror("Error!", "Username Taken Try a Diffrent One.")
         #     return
 
-
         if self.n_role.get() not in [Custumer, Maneger, Developer]:
             ms.showerror(
                 "תקלה!",
@@ -335,24 +177,6 @@ class main:
     def maneger_frame(self):
         self.logf.pack_forget()
         self.head["text"] = "מנהל"
-        Button(
-            self.df,
-            text="פרויקטים",
-            bd=3,
-            font=("", 15),
-            padx=1,
-            pady=1,
-            command=self.project_frame,
-        ).grid()
-        Button(
-            self.df,
-            text="משימות",
-            bd=3,
-            font=("", 15),
-            padx=1,
-            pady=1,
-            command=self.task_frame,
-        ).grid()
         self.df.pack()
 
     def custumer_frame(self):
@@ -487,203 +311,6 @@ class main:
 
         # Customer Widgets
         self.cf = Frame(self.master, padx=20, pady=30)
-
-
-
-        self.pf = Frame(self.master, padx=20, pady=30)     #project frame
-        self.apf = Frame(self.master, padx=20, pady=30)  #add project
-        self.rpf = Frame(self.master, padx=20, pady=30) #remove project
-        self.tf = Frame(self.master, padx=20, pady=30)  # task frame
-        self.atf = Frame(self.master, padx=20, pady=30)  # add task frame
-
-    ##################project editor functions##############################
-
-    def project_frame(self):
-        self.df.forget()
-        global flag1
-        if flag1==0:
-            flag1 = 1
-            self.head["text"] = "ניהול פרויקט"
-            Button(
-                self.pf,
-                text="הוסף פרויקט",
-                bd=3,
-                font=("", 15),
-                padx=1,
-                pady=1,
-                command=self.add_proj_frame,
-            ).grid()
-            Button(
-                self.pf,
-                text="מחק פרויקט",
-                bd=3,
-                font=("", 15),
-                padx=1,
-                pady=1,
-                command=self.remov_proj_frame, ).grid()
-
-        self.pf.pack()
-
-
-    def remov_proj_frame(self):
-        self.pf.forget()
-
-
-        def chekUser():
-
-            pu=PROJECT.projectManager(self.prjNum.get())
-
-            return  self.username.get()==pu
-
-        def remove_proj():
-            self.rpf.forget()
-            if chekUser() is True:
-
-                PROJECT.remove_by_id(self.prjNum.get())
-
-            else:
-                ms.showerror("error", "only project mamager can erase project")
-
-            self.df.pack()
-
-
-        global flag3
-        if flag3==0:
-            flag3=1
-            self.head["text"] = "מחיקת פרויקט"
-            Label(self.rpf, text="מספר מזהה של פרויקט: ", font=("", 20), pady=10, padx=10).grid(
-                sticky=W
-            )
-            Entry(self.rpf, textvariable=self.prjNum, bd=5, font=("", 15)).grid(
-                row=0, column=1
-            )
-            Button(
-                self.rpf,
-                text="מחק",
-                bd=3,
-                font=("", 15),
-                padx=1,
-                pady=1,
-                command=remove_proj,
-            ).grid()
-        self.rpf.pack()
-
-
-
-    def add_proj_frame(self):
-
-
-
-        def add_proj():
-            self.apf.forget()
-            newp=PROJECT(self.prjNum.get(),self.prjName.get(),self.username.get())
-            newp.insert_to_table()
-            self.df.pack()
-
-
-        self.pf.forget()
-
-        global flag2
-        if flag2==0:
-            flag2=1
-            self.head["text"] = "הוספת פרויקט"
-            Label(self.apf, text="מספר מזהה של פרויקט: ", font=("", 20), pady=10, padx=10).grid(
-                sticky=W
-            )
-            Entry(self.apf, textvariable=self.prjNum, bd=5, font=("", 15)).grid(
-                row=0, column=1
-            )
-            Label(self.apf, text="שם של פרויקט: ", font=("", 20), pady=10, padx=10).grid(sticky=W)
-            Entry(self.apf, textvariable=self.prjName, bd=5, font=("", 15)).grid(row=1, column=1)
-
-            Button(
-                self.apf,
-                text="הוסף",
-                bd=3,
-                font=("", 15),
-                padx=1,
-                pady=1,
-                command=add_proj,
-            ).grid()
-
-
-
-
-        self.apf.pack()
-
-
-
-   ###################end project editor functions##############################
-
-   ###########task editor##############
-
-    def add_task_fram(self):
-        self.tf.forget()
-
-        def add_task():
-            self.atf.forget()
-            t=TASK(self.taskId.get(),self.time.get(),self.crew.get())
-            t.insert_to_table()
-            self.head["text"]="מנהל"
-            self.df.pack()
-
-
-
-
-        global flag5
-        if flag5==0:
-            flag5 = 1
-
-
-
-            Label(self.atf, text="מזהה של משימה: ", font=("", 20), pady=10, padx=10).grid(
-                sticky=W
-            )
-            Entry(self.atf, textvariable=self.taskId, bd=5, font=("", 15)).grid(
-                row=0, column=1
-            )
-            Label(self.atf, text="מספר שעות מוערך להשלמת משימה: ", font=("", 20), pady=10, padx=10).grid(sticky=W)
-            Entry(self.atf, textvariable=self.time, bd=5, font=("", 15)).grid(row=1, column=1)
-            Label(self.atf, text="מספר צוות דרוש: ", font=("", 20), pady=10, padx=10).grid(sticky=W)
-            Entry(self.atf, textvariable=self.crew, bd=5, font=("", 15)).grid(row=2, column=1)
-
-            Button(
-                self.atf,
-                text="הוסף",
-                bd=3,
-                font=("", 15),
-                padx=1,
-                pady=1,
-                command=add_task,
-            ).grid()
-        self.head["text"] = "הוספת משימה"
-        self.atf.pack()
-
-
-    def task_frame(self):
-
-        self.df.forget()
-        global flag4
-        if flag4==0:
-            flag4=1
-
-            Button(
-                self.tf,
-                text="הוסף משימה",
-                bd=3,
-                font=("", 15),
-                padx=1,
-                pady=1,
-                command=self.add_task_fram,
-            ).grid()
-        self.head["text"] = "ניהול משימות"
-        self.tf.pack()
-
-
-
-
-   #########end of task editor##############
-
 
 
 root = Tk()
