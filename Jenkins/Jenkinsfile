@@ -21,11 +21,11 @@ pipeline {
             }
             steps {
                 echo 'running test stage'
-                sh 'nosetests AgileStyleTest.py'
+                py.test --junit-xml test-reports/results.xml AgileStyleTest.py'
             }
             post {
                 always {
-                    junit 'nosetests --with-xunit AgileStyleTest.py'
+                    junit 'test-reports/results.xml'
                 }
             }
         }
