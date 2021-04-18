@@ -21,11 +21,11 @@ pipeline {
             }
             steps {
                 echo 'running test stage'
-                sh 'pytest --verbose --junit-xml test-reports/results.xml sources/AgileStyleTest.py'
+                sh 'nosetests AgileStyleTest.py'
             }
             post {
                 always {
-                    junit 'test-reports/results.xml'
+                    junit 'nosetests --with-xunit AgileStyleTest.py'
                 }
             }
         }
