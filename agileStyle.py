@@ -46,6 +46,12 @@ sql = '''CREATE TABLE IF NOT EXISTS projects
           name text,
           managerId text )'''
 cc.execute(sql)
+sql = '''CREATE TABLE IF NOT EXISTS tasks
+         (taskId text PRIMARY KEY,
+          time text,
+          crew text )'''
+cc.execute(sql)
+
 conect.commit()
 conect.close()
 
@@ -60,6 +66,10 @@ global flag4
 flag4=0
 global flag5
 flag5=0
+global flag6
+flag6=0
+global flag7
+flag7=0
 
 #************project class**********************************#
 class PROJECT:
@@ -140,7 +150,7 @@ class PROJECT:
             ms.showinfo("בוצע","נמחק פרויקט: " + id)
 
         except Exception:
-            ms.showerror("שגיאה","שגיאה בזמן מחיקץ פרויקט")
+            ms.showerror("שגיאה","שגיאה בזמן מחיקת פרויקט")
         connect.commit()
         connect.close()
 #*************end of project class**********************************#
@@ -173,16 +183,44 @@ class TASK:
     @classmethod
     def printAll(cls):
         connect= sqlite3.connect('myDb.db')
-        cc = conect.cursor()
+        cc = connect.cursor()
 
         sql = 'SELECT * FROM tasks'
-        cc.execute(sql)
-        rows = cc.fetchall()
+        try:
 
-        for row in rows:
-            print(row)
-        conect.commit()
-        conect.close()
+            cc.execute(sql)
+            rows = cc.fetchall()
+            for row in rows:
+                print(row)
+        except Exception:
+            ms.showerror("שגיאה! נסיון למשוך משימות נכשל")
+
+
+        connect.commit()
+        connect.close()
+
+    @classmethod
+    def get_task(cls,id):
+        connect = sqlite3.connect('myDb.db')
+        cc = connect.cursor()
+
+        sql = """SELECT * 
+                    FROM tasks 
+                    where taskId=?         
+
+                                    """
+        dt = (id,)
+        cc.execute(sql, dt)
+        user = cc.fetchone()
+
+        if not user:
+            ms.showerror("error", "task not exists")
+            return 0
+
+
+        return user
+
+        connect.commit()
 
 #**************end of task class*********************************#
 
@@ -495,6 +533,8 @@ class main:
         self.rpf = Frame(self.master, padx=20, pady=30) #remove project
         self.tf = Frame(self.master, padx=20, pady=30)  # task frame
         self.atf = Frame(self.master, padx=20, pady=30)  # add task frame
+        self.shtf = Frame(self.master, padx=20, pady=30)  # show task frame
+        self.tef = Frame(self.master, padx=20, pady=30)  #  task editor frame
 
     ##################project editor functions##############################
 
@@ -660,6 +700,72 @@ class main:
         self.atf.pack()
 
 
+    def task_editor_frame(self):
+        t = TASK.get_task(self.taskId.get())
+        if t==0:
+            return
+
+        self.time.set(t[1])
+        self.crew.set(t[2])
+        self.shtf.forget()
+
+        Label(self.tef, text=":מזה משימה ", font=("", 20), pady=10, padx=10).grid(
+            row=0, column=1
+        )
+        Label(self.tef, text=self.taskId.get(), font=("", 20), pady=10, padx=10).grid(
+            row=0, column=0
+        )
+        Label(self.tef, text=":מספר שעות מוערך להשלמת משימה ", font=("", 20), pady=10, padx=10).grid(
+            row=1, column=1
+        )
+        Label(self.tef, text=self.time.get(), font=("", 20), pady=10, padx=10).grid(
+            row=1, column=0
+        )
+        Label(self.tef, text=":כמות אנשי צוות דרוש ", font=("", 20), pady=10, padx=10).grid(
+            row=2, column=1
+        )
+        Label(self.tef, text=self.crew.get(), font=("", 20), pady=10, padx=10).grid(
+            row=2, column=0
+        )
+
+
+
+
+        self.tef.pack()
+
+
+
+    def show_task_frame(self):
+        self.tf.forget()
+        print("hello")
+        TASK.printAll()
+
+
+        global flag6
+        if flag6 == 0:
+            flag6 = 1
+            Label(self.shtf, text="מזהה של משימה: ", font=("", 20), pady=10, padx=10).grid(
+                row=0, column=0
+            )
+            Entry(self.shtf, textvariable=self.taskId, bd=5, font=("", 15)).grid(
+                row=0, column=1
+            )
+
+            Button(
+                self.shtf,
+                text="הצג",
+                bd=3,
+                font=("", 15),
+                padx=1,
+                pady=1,
+                command=self.task_editor_frame,
+            ).grid()
+        self.shtf.pack()
+
+
+
+
+
     def task_frame(self):
 
         self.df.forget()
@@ -675,6 +781,15 @@ class main:
                 padx=1,
                 pady=1,
                 command=self.add_task_fram,
+            ).grid()
+            Button(
+                self.tf,
+                text="הצג משימה",
+                bd=3,
+                font=("", 15),
+                padx=1,
+                pady=1,
+                command=self.show_task_frame,
             ).grid()
         self.head["text"] = "ניהול משימות"
         self.tf.pack()
