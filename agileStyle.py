@@ -49,27 +49,16 @@ cc.execute(sql)
 sql = '''CREATE TABLE IF NOT EXISTS tasks
          (taskId text PRIMARY KEY,
           time text,
-          crew text )'''
+          crewNum text )'''
 cc.execute(sql)
 
 conect.commit()
 conect.close()
 
 ###########################################################################################
-global flag1
-flag1=0
-global flag2
-flag2=0
-global flag3
-flag3=0
-global flag4
-flag4=0
-global flag5
-flag5=0
-global flag6
-flag6=0
-global flag7
-flag7=0
+global flag1,flag2,flag3,flag4,flag5,flag6,flag7
+flag1,flag2,flag3,flag4,flag5,flag6,flag7=0,0,0,0,0,0,0,
+
 
 #************project class**********************************#
 class PROJECT:
@@ -221,6 +210,57 @@ class TASK:
         return user
 
         connect.commit()
+
+
+    @classmethod
+    def update_time(cls,id,t):
+        conect = sqlite3.connect('myDb.db')
+        cc = conect.cursor()
+        sql = '''UPDATE tasks 
+        SET time = ?
+        WHERE taskId = ?
+         '''
+        dats_tuple = (id,t)
+        print("t: "+t)
+        print("id: "+id)
+
+        try:
+            cc.execute(sql, dats_tuple)
+            ms.showinfo("","משימה עודכנה בהצלחה")
+            return 1
+
+        except Exception:
+            ms.showerror("שגיאה"," נסיון לעדכן משימה נכשל")
+            return 0
+
+        conect.commit()
+        conect.close()
+
+    @classmethod
+    def update_crew(cls,id,cr):
+        conect = sqlite3.connect('myDb.db')
+        cc = conect.cursor()
+        sql = '''UPDATE tasks 
+        SET crewNum= ?
+        WHERE taskId = ?
+         '''
+        dats_tuple = (id,cr)
+        print("c: "+cr)
+        print("id: "+id)
+
+        try:
+            cc.execute(sql, dats_tuple)
+            ms.showinfo("","מספר אנשי צוות עודכן בהצלחה")
+            return 1
+
+        except Exception:
+            ms.showerror("שגיאה"," נסיון לעדכן משימה נכשל")
+            return 0
+
+        conect.commit()
+        conect.close()
+
+
 
 #**************end of task class*********************************#
 
@@ -728,6 +768,49 @@ class main:
             row=2, column=0
         )
 
+
+        def update_time():
+            b=TASK.update_time(self.taskId.get(),self.time.get())
+            if b==1:
+                Label(self.tef, text=self.time.get(), font=("", 20), pady=10, padx=10).grid(
+                row=1, column=0)
+
+
+        def update_crew():
+            b=TASK.update_crew(self.taskId.get(),self.crew.get())
+
+            if b == 1:
+                Label(self.tef, text=self.crew.get(), font=("", 20), pady=10, padx=10).grid(
+                    row=2, column=0
+                )
+
+        Button(
+            self.tef,
+            text="עדכן שעות",
+            bd=3,
+            font=("", 15),
+            padx=1,
+            pady=1,
+            command=update_time,
+        ).grid(row=4, column=2)
+
+        Button(
+            self.tef,
+            text="עדכן כמות צוות",
+            bd=3,
+            font=("", 15),
+            padx=1,
+            pady=1,
+            command=update_crew,
+        ).grid(row=5, column=2)
+
+        Entry(self.tef, textvariable=self.time, bd=5, font=("", 15)).grid(
+            row=4, column=1
+        )
+
+        Entry(self.tef, textvariable=self.crew, bd=5, font=("", 15)).grid(
+            row=5, column=1
+        )
 
 
 
