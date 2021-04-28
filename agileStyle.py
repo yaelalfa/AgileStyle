@@ -55,6 +55,14 @@ sql = '''CREATE TABLE IF NOT EXISTS project_tasks
           '''
 cc.execute(sql)
 
+sql = '''CREATE TABLE IF NOT EXISTS project_crew
+         (projId text NOT NULL,
+          user text NOT NULL,
+          PRIMARY KEY (projId,user))
+          '''
+cc.execute(sql)
+
+
 conect.commit()
 conect.close()
 
@@ -366,15 +374,52 @@ class TASK:
         connect.commit()
 
 
-
-
-
-
-
 #**************end of task class*********************************#
 
 
+#************project crew class**********************************#
+class PROJECT_CREW:
+    @classmethod
+    def insert_to_table(cls,pid,us):
+        conect = sqlite3.connect('myDb.db')
+        cc = conect.cursor()
+        sql = '''INSERT INTO project_crew VALUES(?,?)
+         '''
+        dats_tuple = (pid,us)
 
+        try:
+            cc.execute(sql, dats_tuple)
+            ms.showinfo(":עובד חדש נוסף לפרויקט"+pid)
+
+        except Exception:
+            ms.showerror("שגיאה! נסיון להכניס עובד חדש לטבלה נכשל")
+
+        conect.commit()
+        conect.close()
+
+    @classmethod
+    def get_crew(cls, pid):
+        conect = sqlite3.connect('myDb.db')
+        cc = conect.cursor()
+        sql = '''SELECT * FROM project_crew 
+                 WHERE projId=?
+             '''
+        dats_tuple = (pid,)
+
+        try:
+            cc.execute(sql, dats_tuple)
+            rows=cc.fetchall()
+            return rows
+
+        except Exception:
+            ms.showerror("שגיאה","נסיון למשוך צוות עובדים נכשל")
+
+        conect.commit()
+        conect.close()
+
+
+
+# ************end of project crew class**********************************#
 
 
 
@@ -402,6 +447,7 @@ class main:
         self.taskId=StringVar()
         self.time=StringVar()
         self.crew=StringVar()
+        self.user_crew=StringVar()
 
     # Login Function
     def login(self):
@@ -683,6 +729,8 @@ class main:
         self.pef = Frame(self.master, padx=20, pady=30)  #project editor frame
         self.rtf = Frame(self.master, padx=20, pady=30)  # remove task frame
 
+        self.cf = Frame(self.master, padx=20, pady=30)  # crew frame
+
     ##################project editor functions##############################
 
     def project_frame(self):
@@ -802,16 +850,123 @@ class main:
             self.pef.forget()
             self.project_frame()
 
-        Button(self.pef,text="חזור",bd=3,font=("", 15),padx=1,pady=1, command=back, ).grid(row=4, column=1)
+
         Label(self.pef, text=":שם הפרויקט ", font=("", 20), pady=10, padx=10).grid(row=1, column=1)
         Label(self.pef, text=proj[1], font=("", 20), pady=10, padx=10).grid(row=1, column=0)
         Label(self.pef, text=":מזהה הפרויקט ", font=("", 20), pady=10, padx=10).grid(row=2, column=1)
         Label(self.pef, text=proj[0], font=("", 20), pady=10, padx=10).grid(row=2, column=0)
         Button(self.pef, text="משימות", bd=3, font=("", 15), padx=1, pady=1, command=self.task_frame, ).grid(row=3, column=1)
         self.prjName.set(proj[1])
+        Button(self.pef, text="צוות", bd=3, font=("", 15), padx=1, pady=1, command=self.crew_frame, ).grid(row=4,column=1)
 
+        Button(self.pef, text="חזור", bd=3, font=("", 15), padx=1, pady=1, command=back, ).grid(row=5, column=1)
 
         self.pef.pack()
+
+
+
+
+    def crew_frame(self):
+        self.pef.forget()
+
+        def back():
+            self.cf.forget()
+            self.proj_editor_frame()
+
+        def my_crew():
+            j=6
+            crew = PROJECT_CREW.get_crew(self.prjNum.get())
+            Label(self.cf, text="*******************", font=("", 20), pady=10, padx=10).grid(row=4, column=1)
+            Label(self.cf, text="הצוות שלי", font=("", 20, 'underline'), pady=10, padx=10).grid(row=5, column=1)
+            for c in crew:
+                Label(self.cf, text="   " + c[1] + "   ", font=("", 20), pady=10, padx=10).grid(row=j, column=1)
+
+                j = j + 1
+
+            Label(self.cf, text="            ", font=("", 20), pady=10, padx=10).grid(row=j, column=1)
+            j = j + 1
+            Label(self.cf, text="            ", font=("", 20), pady=10, padx=10).grid(row=j, column=1)
+
+        def add_crew_member():
+            c = self.users_db.cursor()
+            sql = "SELECT * FROM users WHERE role = 'developer' AND username=? "
+            tp=(self.user_crew.get(),)
+            try:
+                c.execute(sql,tp)
+
+
+            except:
+                ms.showerror("שגיאה", "משתמש לא נמצא")
+                return
+
+            PROJECT_CREW.insert_to_table(self.prjNum.get(), self.user_crew.get())
+            my_crew()
+
+
+
+
+        c = self.users_db.cursor()
+        # Find user If there is any take proper action
+        sql = "SELECT * FROM users WHERE role = 'developer' "
+        try:
+            c.execute(sql)
+            users = c.fetchall()
+
+        except:
+            ms.showerror("שגיאה","ניסיון של שליפת משתמשים נכשל")
+
+
+
+
+        Button(
+            self.cf,
+            text="חזור",
+            bd=3,
+            font=("", 15),
+            padx=1,
+            pady=1,
+            command=back,
+        ).grid(row=2, column=2)
+
+        Button(self.cf, text="הוסף לצוות שלי", bd=3, font=("", 15), padx=1, pady=1, command=add_crew_member, ).grid(row=3, column=0)
+
+        Label(self.cf, text=":שם משתמש ", font=("", 20), pady=10, padx=10).grid(
+            row=3, column=2
+        )
+        Entry(self.cf, textvariable=self.user_crew, bd=5, font=("", 15)).grid(
+            row=3, column=1
+        )
+
+
+
+
+
+
+
+
+        Label(self.cf, text="*******************", font=("", 20), pady=10, padx=10).grid(row=4, column=0)
+        Label(self.cf, text="עובדים קיימים", font=("", 20,'underline'), pady=10, padx=10).grid(row=5, column=0)
+        i = 6
+        for u in users:
+            Label(self.cf, text="   " + u[0] + "   ", font=("", 20), pady=10, padx=10).grid(row=i, column=0)
+
+            i = i + 1
+
+        Label(self.cf, text="            ", font=("", 20), pady=10, padx=10).grid(row=i, column=0)
+
+        i = i + 1
+
+        Label(self.cf, text="           ", font=("", 20), pady=10, padx=10).grid(row=i, column=0)
+        i=i+1
+
+        my_crew()
+
+
+        self.cf.pack()
+
+
+
+
 
 
 
