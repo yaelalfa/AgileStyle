@@ -62,6 +62,15 @@ sql = '''CREATE TABLE IF NOT EXISTS project_crew
           '''
 cc.execute(sql)
 
+sql = '''CREATE TABLE IF NOT EXISTS user_message
+         (
+          sender text NOT NULL,
+          to_user text NOT NULL,
+          message text )
+
+          '''
+cc.execute(sql)
+
 
 conect.commit()
 conect.close()
@@ -421,8 +430,47 @@ class PROJECT_CREW:
 
 # ************end of project crew class**********************************#
 
+# ************message  class**********************************#
+class MESSAGE:
+    @classmethod
+    def new_message(cls,sender,to,message):
+        conect = sqlite3.connect('myDb.db')
+        cc = conect.cursor()
+        sql = '''INSERT INTO user_message VALUES(?,?,?)
+                '''
+        dats_tuple = (sender,to,message)
+
+        try:
+            cc.execute(sql, dats_tuple)
+            ms.showinfo("", ":הודעה נשלחה בהצלחה ל" + to)
+
+        except Exception:
+            ms.showerror("שגיאה", "נסיון לשלוח הודעה נכשל נכשל")
+
+        conect.commit()
+        conect.close()
+
+    @classmethod
+    def printAll(cls):
+        connect = sqlite3.connect('myDb.db')
+        cc = connect.cursor()
+
+        sql = 'SELECT * FROM user_message'
+        try:
+
+            cc.execute(sql)
+            rows = cc.fetchall()
+            for row in rows:
+                print(row)
+        except Exception:
+            ms.showerror(  "שגיאה", "שגיאה! נסיון למשוך הודעות נכשל")
+
+        connect.commit()
+        connect.close()
 
 
+
+# ************end of message  class**********************************#
 
 # main Class
 class main:
@@ -869,6 +917,8 @@ class main:
     def crew_frame(self):
         self.pef.forget()
 
+
+
         def back():
             self.cf.forget()
             self.proj_editor_frame()
@@ -900,6 +950,14 @@ class main:
                 return
 
             PROJECT_CREW.insert_to_table(self.prjNum.get(), self.user_crew.get())
+
+            msg = "שוייכת לפרויקט מספר "
+            msg += self.prjNum.get()
+
+
+
+            MESSAGE.new_message(self.username.get(), self.user_crew.get(), msg)
+            MESSAGE.printAll()
             my_crew()
 
 
@@ -1173,18 +1231,32 @@ class main:
             self.tef.forget()
             self.task_frame()
 
+        def message_crew():
+            crew=PROJECT_CREW.get_crew(self.prjNum.get())
+            msg="בפרויקט מספר "
+            msg+=self.prjNum.get()
+            msg+="יש שינוי במשימה "
+            msg+=self.taskId.get()
+
+            for c in crew:
+                MESSAGE.new_message(self.username.get(),c[1],msg)
+            MESSAGE.printAll()
+
+
 
         def change_h():
             TASK.update_hour(self.prjNum.get(),self.taskId.get(),self.time.get())
             Label(self.tef, text=self.time.get(), font=("", 20), pady=10, padx=10).grid(
                 row=1, column=0
             )
+            message_crew()
 
         def change_c():
             TASK.update_crew(self.prjNum.get(),self.taskId.get(),self.crew.get())
             Label(self.tef, text=self.crew.get(), font=("", 20), pady=10, padx=10).grid(
                 row=2, column=0
             )
+            message_crew()
 
         self.time.set(t[2])
         self.crew.set(t[3])
@@ -1262,7 +1334,7 @@ class main:
         tasks=TASK.get_tasks(self.prjNum.get())
 
         def back():
-            self.pef.forget()
+            self.tf.forget()
             self.project_frame()
 
         self.head["text"] = "ניהול משימות"
@@ -1273,7 +1345,7 @@ class main:
         Button(self.tf, text="הוסף משימה", bd=3, font=("", 15), padx=1, pady=1, command=self.add_task_frame, ).grid(row=2, column=1)
         Button(self.tf, text="הצג משימה", bd=3, font=("", 15), padx=1, pady=1, command=self.show_task_frame, ).grid(row=3, column=1)
         Button(self.tf, text="מחק משימה", bd=3, font=("", 15), padx=1, pady=1, command=self.remove_task_frame, ).grid(
-            row=3, column=1)
+            row=4, column=1)
 
 
 
