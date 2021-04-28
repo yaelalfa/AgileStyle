@@ -468,6 +468,24 @@ class MESSAGE:
         connect.commit()
         connect.close()
 
+    @classmethod
+    def get_my_mesagges(cls,us):
+        connect = sqlite3.connect('myDb.db')
+        cc = connect.cursor()
+
+        sql = 'SELECT * FROM user_message where to_user=? '
+        tp=(us,)
+        try:
+
+            cc.execute(sql,tp)
+            rows = cc.fetchall()
+            return rows
+        except Exception:
+            ms.showerror("שגיאה", "שגיאה! נסיון למשוך הודעות נכשל")
+
+        connect.commit()
+        connect.close()
+
 
 
 # ************end of message  class**********************************#
@@ -613,6 +631,9 @@ class main:
         self.head["text"] = "מפתח"
         self.df.pack()
 
+        self.messages(self.df, 2)
+
+
     def maneger_frame(self):
         self.logf.pack_forget()
         self.head["text"] = "מנהל"
@@ -627,6 +648,8 @@ class main:
             pady=1,
             command=self.project_frame,
         ).grid(row=1, column=1)
+
+        self.messages(self.mf,2)
 
         self.mf.pack()
 
@@ -1328,6 +1351,9 @@ class main:
 
 
 
+
+
+
     def task_frame(self):
         self.pef.forget()
 
@@ -1381,6 +1407,22 @@ class main:
 
 
    #########end of task editor##############
+
+    def messages(self, Widgets, r):   #### show the messages the the user have
+        #width----the frame u use ( --self.df--- for example)
+        # r---the row u want to print the messages
+        msg = MESSAGE.get_my_mesagges(self.username.get())
+        if not msg:
+            Label(Widgets, text="אין הודעות", font=("", 20), pady=10, padx=10).grid(row=r, column=1)
+
+        else:
+            Label(Widgets, text="שולח ההודעה", font=("", 20, 'underline'), pady=10, padx=10).grid(row=r, column=1)
+            Label(Widgets, text="ההודעה", font=("", 20, 'underline'), pady=10, padx=10).grid(row=r, column=0)
+            r = r + 1
+            for m in msg:
+                Label(Widgets, text=m[0], font=("", 20), pady=10, padx=10).grid(row=r, column=1)
+                Label(Widgets, text=m[2], font=("", 20), pady=10, padx=10).grid(row=r, column=0)
+                r = r + 1
 
 
 
