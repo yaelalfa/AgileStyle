@@ -630,9 +630,17 @@ class main:
         self.logf.pack_forget()
         self.head["text"] = "מפתח"
         self.df.pack()
-
+        Button(
+            self.mf,
+            text="משימות",
+            bd=3,
+            font=("", 15),
+            padx=1,
+            pady=1,
+            command=self.add_task_frame,
+        ).grid(row=1, column=1)
         self.messages(self.df, 2)
-
+        self.mf.pack()
 
     def maneger_frame(self):
         self.logf.pack_forget()
