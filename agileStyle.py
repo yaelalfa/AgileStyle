@@ -209,6 +209,8 @@ class PROJECT:
         connect.commit()
         connect.close()
 
+
+
 #*************end of project class**********************************#
 
 #**************task class*********************************#
@@ -426,7 +428,15 @@ class PROJECT_CREW:
         conect.commit()
         conect.close()
 
-
+    @classmethod
+    def get_project(cls, username):
+        connect = sqlite3.connect('myDb.db')
+        cc = connect.cursor()
+        sql = 'SELECT projId FROM project_crew WHERE  user=?'
+        cc.execute(sql, (username,))
+        row = cc.fetchone()
+        print(row)
+        return row
 
 # ************end of project crew class**********************************#
 
@@ -628,19 +638,45 @@ class main:
 
     def developer_frame(self):
         self.logf.pack_forget()
+        self.att.pack_forget()
+        self.atf.pack_forget()
         self.head["text"] = "מפתח"
         self.df.pack()
         Button(
-            self.mf,
-            text="משימות",
+            self.df,
+            text="הוספת משימות",
             bd=3,
             font=("", 15),
             padx=1,
             pady=1,
             command=self.add_task_frame_developer,
         ).grid(row=1, column=1)
+        Button(self.df,
+               text=" דף משימות ",
+               bd=3,
+               font=("", 15),
+               padx=5,
+               pady=5,
+               command=self.all_teammates_task,
+               ).grid(row=4, column=2)
+        Button(self.df,
+               text=" סכימה ",
+               bd=3,
+               font=("", 15),
+               padx=5,
+               pady=5,
+               command=self.schema_dev,
+               ).grid(row=4, column=1)
+        Button(self.df,
+               text=" להתנתק ",
+               bd=3,
+               font=("", 15),
+               padx=5,
+               pady=5,
+               command=self.login_frame,
+               ).grid(row=4, column=0)
         self.messages(self.df, 2)
-        self.mf.pack()
+        self.df.pack()
 
     def maneger_frame(self):
         self.logf.pack_forget()
@@ -663,8 +699,88 @@ class main:
 
     def custumer_frame(self):
         self.logf.pack_forget()
+        self.scc.pack_forget()
         self.head["text"] = "לקוח"
-        self.df.pack()
+        Button(self.cusf,
+               text=" סכימה ",
+               bd=3,
+               font=("", 15),
+               padx=5,
+               pady=5,
+               command=self.schema_cus,
+               ).grid(row=4, column=1)
+        Button(self.cusf,
+               text=" להתנתק ",
+               bd=3,
+               font=("", 15),
+               padx=5,
+               pady=5,
+               command=self.login_frame,
+               ).grid(row=4, column=0)
+        self.cusf.pack()
+
+    ## tasks for developer page
+    def all_teammates_task(self):
+        self.df.pack_forget()
+        self.head["text"] = "דף משימות"
+        projectAssign = PROJECT_CREW.get_project(self.username.get())
+        print(projectAssign)
+        tasks = TASK.get_tasks(projectAssign[0])
+        crew = PROJECT_CREW.get_crew(projectAssign[0])
+        print(tasks)
+        Label(self.att, text="מס' מזהה-משימות", font=("", 18), pady=10, padx=10).grid(row=0, column=0)
+        r = 0
+        for i in tasks:
+            r = r + 1
+            Label(self.att, text=i[1], font=("", 15), pady=10, padx=10).grid(row=r, column=0)
+        r = r + 1
+        Label(self.att, text="חברי צוות", font=("", 18), pady=10, padx=10).grid(row=r, column=0)
+
+        for c in crew:
+            if c[1] != '' and c[1] != None:
+                r += 1
+                Label(self.att, text=c[1], font=("", 14), pady=10, padx=10).grid(row=r, column=0)
+        r = r + 1
+        Button(
+            self.att,
+            text="חזור",
+            bd=3,
+            font=("", 15),
+            padx=1,
+            pady=1,
+            command=self.developer_frame,
+        ).grid(row=r, column=2)
+        self.att.pack()
+
+    def schema_dev(self):
+        self.df.pack_forget()
+        self.cf.pack_forget()
+        self.head["text"] = "סכימת התקדמות"
+        Button(
+            self.scd,
+            text="חזור",
+            bd=3,
+            font=("", 15),
+            padx=1,
+            pady=1,
+            command=self.developer_frame,
+        ).grid(row=2, column=0)
+        self.scd.pack()
+
+    def schema_cus(self):
+        self.cusf.pack_forget()
+        self.cf.pack_forget()
+        self.head["text"] = "סכימת התקדמות"
+        Button(
+            self.scc,
+            text="חזור",
+            bd=3,
+            font=("", 15),
+            padx=1,
+            pady=1,
+            command=self.custumer_frame,
+        ).grid(row=2, column=0)
+        self.scc.pack()
 
     ## DRAW WIDGETS ##
     def widgets(self):
@@ -792,7 +908,7 @@ class main:
         self.mf = Frame(self.master, padx=20, pady=30)
 
         # Customer Widgets
-        self.cf = Frame(self.master, padx=20, pady=30)
+        self.cusf = Frame(self.master, padx=20, pady=30)
 
 
 
@@ -809,6 +925,9 @@ class main:
         self.rtf = Frame(self.master, padx=20, pady=30)  # remove task frame
 
         self.cf = Frame(self.master, padx=20, pady=30)  # crew frame
+        self.att = Frame(self.master, padx=20, pady=100)  # tasks for project frame
+        self.scd = Frame(self.master, padx=20, pady=100)  # developer schema frame
+        self.scc = Frame(self.master, padx=20, pady=100)  # customer schema frame
 
     ##################project editor functions##############################
 
@@ -1218,6 +1337,7 @@ class main:
 
     def add_task_frame_developer(self):
         self.tf.forget()
+        self.df.forget()
         def back():
             self.atf.forget()
             self.task_frame()
