@@ -637,7 +637,7 @@ class main:
             font=("", 15),
             padx=1,
             pady=1,
-            command=self.add_task_frame,
+            command=self.add_task_frame_developer,
         ).grid(row=1, column=1)
         self.messages(self.df, 2)
         self.mf.pack()
@@ -1216,6 +1216,40 @@ class main:
         self.head["text"] = "הוספת משימה"
         self.atf.pack()
 
+    def add_task_frame_developer(self):
+        self.tf.forget()
+        def back():
+            self.atf.forget()
+            self.task_frame()
+
+        def add_task_developer():
+            t=TASK(self.taskId.get(),self.time.get(),self.crew.get(),self.prjNum.get())
+            t.insert_to_table()
+
+
+
+        Button(self.atf, text="חזור", bd=3, font=("", 15), padx=1, pady=1, command= self.developer_frame, ).grid(row=0, column=1)
+        Label(self.atf, text=":מזהה של משימה ", font=("", 20), pady=10, padx=10).grid(row=1, column=1 )
+        Entry(self.atf, textvariable=self.taskId, bd=5, font=("", 15)).grid(row=1, column=0)
+        Label(self.atf, text=":מספר שעות מוערך להשלמת משימה ", font=("", 20), pady=10, padx=10).grid(row=2, column=1)
+        Entry(self.atf, textvariable=self.time, bd=5, font=("", 15)).grid(row=2, column=0)
+        Label(self.atf, text=":מספר צוות דרוש ", font=("", 20), pady=10, padx=10).grid(row=3, column=1)
+        Entry(self.atf, textvariable=self.crew, bd=5, font=("", 15)).grid(row=3, column=0)
+
+        Button(
+            self.atf,
+            text="הוסף",
+            bd=3,
+            font=("", 15),
+            padx=1,
+            pady=1,
+            command=add_task_developer,
+        ).grid(row=4, column=0)
+
+
+
+        self.head["text"] = "הוספת משימה"
+        self.atf.pack()
 
     def remove_task_frame(self):
         self.tf.forget()
