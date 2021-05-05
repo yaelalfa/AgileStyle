@@ -46,11 +46,17 @@ sql = '''CREATE TABLE IF NOT EXISTS projects
           name text,
           managerId text )'''
 cc.execute(sql)
+
+sql = '''DROP TABLE project_tasks
+          '''
+cc.execute(sql)
+
 sql = '''CREATE TABLE IF NOT EXISTS project_tasks
          (projId text NOT NULL,
           taskId text NOT NULL,
           time text,
           crew text ,
+          status text,
           PRIMARY KEY (projId,taskId))
           '''
 cc.execute(sql)
@@ -215,19 +221,20 @@ class PROJECT:
 
 #**************task class*********************************#
 class TASK:
-    def __init__(self,taskId,time,crewN,projId):
+    def __init__(self,taskId,time,crewN,projId,status):
         self.taskId=taskId
         self.time=time
         self.crewNum=crewN
         self.projId=projId
+        self.status=status
 
 
     def insert_to_table(self):
         conect = sqlite3.connect('myDb.db')
         cc = conect.cursor()
-        sql = '''INSERT INTO project_tasks VALUES(?,?,?,?)
+        sql = '''INSERT INTO project_tasks VALUES(?,?,?,?,?)
          '''
-        dats_tuple = (self.projId,self.taskId,self.time,self.crewNum)
+        dats_tuple = (self.projId,self.taskId,self.time,self.crewNum,self.status)
 
         try:
             cc.execute(sql, dats_tuple)
@@ -524,6 +531,7 @@ class main:
         self.time=StringVar()
         self.crew=StringVar()
         self.user_crew=StringVar()
+        self.status=StringVar()
 
     # Login Function
     def login(self):
@@ -1324,7 +1332,7 @@ class main:
             self.task_frame()
 
         def add_task():
-            t=TASK(self.taskId.get(),self.time.get(),self.crew.get(),self.prjNum.get())
+            t=TASK(self.taskId.get(),self.time.get(),self.crew.get(),self.prjNum.get(),self.status.get())
             t.insert_to_table()
 
 
@@ -1336,7 +1344,8 @@ class main:
         Entry(self.atf, textvariable=self.time, bd=5, font=("", 15)).grid(row=2, column=0)
         Label(self.atf, text=":מספר צוות דרוש ", font=("", 20), pady=10, padx=10).grid(row=3, column=1)
         Entry(self.atf, textvariable=self.crew, bd=5, font=("", 15)).grid(row=3, column=0)
-
+        Label(self.atf, text=":סטאטוס (IN PROGRES/DONE/DEF) ", font=("", 20), pady=10, padx=10).grid(row=4, column=1)
+        Entry(self.atf, textvariable= self.status, bd=5, font=("", 15)).grid(row=4, column=0)
         Button(
             self.atf,
             text="הוסף",
@@ -1360,7 +1369,7 @@ class main:
             self.task_frame()
 
         def add_task_developer():
-            t=TASK(self.taskId.get(),self.time.get(),self.crew.get(),self.prjNum.get())
+            t=TASK(self.taskId.get(),self.time.get(),self.crew.get(),self.prjNum.get(),self.status.get())
             t.insert_to_table()
 
 
@@ -1372,7 +1381,8 @@ class main:
         Entry(self.atf, textvariable=self.time, bd=5, font=("", 15)).grid(row=2, column=0)
         Label(self.atf, text=":מספר צוות דרוש ", font=("", 20), pady=10, padx=10).grid(row=3, column=1)
         Entry(self.atf, textvariable=self.crew, bd=5, font=("", 15)).grid(row=3, column=0)
-
+        Label(self.atf, text=":סטאטוס (IN PROGRES/DONE/DEF) ", font=("", 20), pady=10, padx=10).grid(row=4, column=1)
+        Entry(self.atf, textvariable= self.status, bd=5, font=("", 15)).grid(row=4, column=0)
         Button(
             self.atf,
             text="הוסף",
@@ -1381,7 +1391,7 @@ class main:
             padx=1,
             pady=1,
             command=add_task_developer,
-        ).grid(row=4, column=0)
+        ).grid(row=6, column=0)
 
 
 
