@@ -660,6 +660,14 @@ class main:
                command=self.task_editor_frame_developer,
                ).grid(row=1, column=0)
         Button(self.df,
+               text="מחיקת משימות ",
+               bd=3,
+               font=("", 15),
+               padx=1,
+               pady=1,
+               command=self.remove_task_frame_developer,
+               ).grid(row=1, column=4)
+        Button(self.df,
                text=" דף משימות ",
                bd=3,
                font=("", 15),
