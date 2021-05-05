@@ -657,7 +657,7 @@ class main:
                font=("", 15),
                padx=1,
                pady=1,
-               command=self.task_editor_frame,
+               command=self.task_editor_frame_developer,
                ).grid(row=1, column=4)
         Button(self.df,
                text=" דף משימות ",
@@ -1413,7 +1413,79 @@ class main:
 
         self.rtf.pack()
 
+    def task_editor_frame_developer(self):
+        t = TASK.get_task(self.taskId.get(),self.prjNum.get())
+        if not t:
+            ms.showerror("error", "המשימה המבוקשת לא נמצאת")
+            return
 
+        def back():
+            self.tef.forget()
+            self.developer_frame
+
+        def message_crew():
+            crew=PROJECT_CREW.get_crew(self.prjNum.get())
+            msg="בפרויקט מספר "
+            msg+=self.prjNum.get()
+            msg+="יש שינוי במשימה "
+            msg+=self.taskId.get()
+
+            for c in crew:
+                MESSAGE.new_message(self.username.get(),c[1],msg)
+            MESSAGE.printAll()
+
+
+
+        def change_h():
+            TASK.update_hour(self.prjNum.get(),self.taskId.get(),self.time.get())
+            Label(self.tef, text=self.time.get(), font=("", 20), pady=10, padx=10).grid(
+                row=1, column=0
+            )
+            message_crew()
+
+        def change_c():
+            TASK.update_crew(self.prjNum.get(),self.taskId.get(),self.crew.get())
+            Label(self.tef, text=self.crew.get(), font=("", 20), pady=10, padx=10).grid(
+                row=2, column=0
+            )
+            message_crew()
+
+        self.time.set(t[2])
+        self.crew.set(t[3])
+        self.shtf.forget()
+
+        Label(self.tef, text=":מזה משימה ", font=("", 20), pady=10, padx=10).grid(
+            row=0, column=1
+        )
+        Label(self.tef, text=self.taskId.get(), font=("", 20), pady=10, padx=10).grid(
+            row=0, column=0
+        )
+        Label(self.tef, text=":מספר שעות מוערך להשלמת משימה ", font=("", 20), pady=10, padx=10).grid(
+            row=1, column=1
+        )
+        Label(self.tef, text=self.time.get(), font=("", 20), pady=10, padx=10).grid(
+            row=1, column=0
+        )
+        Label(self.tef, text=":כמות אנשי צוות דרוש ", font=("", 20), pady=10, padx=10).grid(
+            row=2, column=1
+        )
+        Label(self.tef, text=self.crew.get(), font=("", 20), pady=10, padx=10).grid(
+            row=2, column=0
+        )
+
+        Entry(self.tef, textvariable=self.time, bd=5, font=("", 15)).grid(row=3, column=0)
+        Button(self.tef, text="שנה מספר שעות ", bd=3, font=("", 15), padx=1, pady=1, command=change_h, ).grid(row=3, column=1)
+
+        Entry(self.tef, textvariable=self.crew, bd=5, font=("", 15)).grid(row=4, column=0)
+        Button(self.tef, text="שנה כמות צוות", bd=3, font=("", 15), padx=1, pady=1, command=change_c, ).grid(row=4,column=1)
+
+
+        Button(self.tef, text="חזור", bd=3, font=("", 15), padx=1, pady=1, command=back, ).grid(row=5, column=0)
+
+
+
+
+        self.tef.pack()
 
     def task_editor_frame(self):
         t = TASK.get_task(self.taskId.get(),self.prjNum.get())
