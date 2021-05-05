@@ -22,8 +22,7 @@ pipeline {
             }
             steps {
                 echo 'running test stage'
-                sh 'sudo -H pip install --upgrade pip'
-                sh 'sudo -H pip install pytest'
+                sh 'pip install pytest'
                 sh 'pytest --junit-xml test-reports/results.xml agileStyleTest.py'
 
             }
