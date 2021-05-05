@@ -1376,7 +1376,7 @@ class main:
             padx=1,
             pady=1,
             command=add_task,
-        ).grid(row=4, column=0)
+        ).grid(row=6, column=0)
 
 
 
@@ -1413,7 +1413,7 @@ class main:
             padx=1,
             pady=1,
             command=add_task_developer,
-        ).grid(row=6, column=0)
+        ).grid(row=8, column=0)
 
 
 
