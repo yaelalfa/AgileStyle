@@ -33,12 +33,14 @@ pipeline {
             }
         }
         stage('Integration Test') {
-                    try {
-                        sh 'mvn -s ../configuration/settings.xml -B clean test'
-                    } finally {
-                        junit 'target/surefire-reports/*.xml'
-                    }
+                    steps{
+                         try {
+                            sh 'mvn -s ../configuration/settings.xml -B clean test'
+                         } finally {
+                              junit 'target/surefire-reports/*.xml'
+                           } 
 
+                    }       
         }
                            
                            
