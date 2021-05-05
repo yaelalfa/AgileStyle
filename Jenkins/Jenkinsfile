@@ -32,8 +32,27 @@ pipeline {
                 }
             }
         }
+        stage('Integration Test') {
+                    try {
+                        sh 'mvn -s ../configuration/settings.xml -B clean test'
+                    } finally {
+                        junit 'target/surefire-reports/*.xml'
+                    }
+
+        }
                            
                            
     }      
-    
+    post {
+        failure{
+               mail to:"yaelal@ac.sce.ac.il",
+               subject: "Failed: Job",
+               body: "Failed"
+        }
+        success{
+               mail to:"yaelal@ac.sce.ac.il",
+               subject: "Success: Job",
+               body: "Success"
+        }
+    } 
 }
