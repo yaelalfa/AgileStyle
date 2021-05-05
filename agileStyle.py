@@ -1426,7 +1426,7 @@ class main:
 
         def back():
             self.rtf.forget()
-            self.task_editor_frame_developer()
+            self.developer_frame
 
         def remove():
             TASK.delet_task(self.prjNum.get(),self.taskId.get())
