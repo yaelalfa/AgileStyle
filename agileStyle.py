@@ -650,7 +650,7 @@ class main:
             padx=1,
             pady=1,
             command=self.add_task_frame_developer,
-        ).grid(row=1, column=1)
+        ).grid(row=1, column=2)
         Button(self.df,
                text="עריכת משימות ",
                bd=3,
@@ -658,7 +658,7 @@ class main:
                padx=1,
                pady=1,
                command=self.task_editor_frame_developer,
-               ).grid(row=1, column=4)
+               ).grid(row=1, column=0)
         Button(self.df,
                text=" דף משימות ",
                bd=3,
