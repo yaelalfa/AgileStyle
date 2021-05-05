@@ -1413,6 +1413,39 @@ class main:
 
         self.rtf.pack()
 
+    def remove_task_frame_developer(self):
+        self.tf.forget()
+
+        def back():
+            self.rtf.forget()
+            self.task_editor_frame_developer()
+
+        def remove():
+            TASK.delet_task(self.prjNum.get(),self.taskId.get())
+
+
+
+        Button(self.rtf, text="חזור", bd=3, font=("", 15), padx=1, pady=1, command=back, ).grid(row=3, column=0)
+
+        Label(self.rtf, text=":מזהה של משימה ", font=("", 20), pady=10, padx=10).grid(
+            row=1, column=1
+        )
+        Entry(self.rtf, textvariable=self.taskId, bd=5, font=("", 15)).grid(
+            row=1, column=0
+        )
+
+        Button(
+            self.rtf,
+            text="מחק",
+            bd=3,
+            font=("", 15),
+            padx=1,
+            pady=1,
+            command=remove,
+        ).grid(row=2, column=0)
+
+        self.rtf.pack()
+
     def task_editor_frame_developer(self):
         t = TASK.get_task(self.taskId.get(),self.prjNum.get())
         if not t:
