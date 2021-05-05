@@ -47,9 +47,9 @@ sql = '''CREATE TABLE IF NOT EXISTS projects
           managerId text )'''
 cc.execute(sql)
 
-sql = '''DROP TABLE project_tasks
-          '''
-cc.execute(sql)
+#sql = '''DROP TABLE project_tasks
+#          '''
+#cc.execute(sql)
 
 sql = '''CREATE TABLE IF NOT EXISTS project_tasks
          (projId text NOT NULL,
@@ -363,6 +363,28 @@ class TASK:
             ms.showerror("error", "שגיאה בעידכון מספר צוות ")
 
 
+
+        connect.commit()
+
+    @classmethod
+    def update_status(cls, pid,tid,status):
+        connect = sqlite3.connect('myDb.db')
+        cc = connect.cursor()
+
+        sql = """UPDATE project_tasks
+                        SET status=?
+                        where  projId=?  
+                        AND taskId=?    
+
+                                        """
+        dt = (status,pid,tid)
+
+        try:
+
+            cc.execute(sql,dt)
+            ms.showinfo("", "סטאטוס משימה עודכן בהצלחה ")
+        except Exception:
+            ms.showerror("error", "שגיאה בעידכון סטאטוס ")
 
         connect.commit()
 
@@ -1501,6 +1523,14 @@ class main:
             )
             message_crew()
 
+        def change_s():
+            TASK.update_status(self.prjNum.get(),self.taskId.get(),self.status.get())
+            Label(self.tef, text=self.crew.get(), font=("", 20), pady=10, padx=10).grid(
+                row=2, column=0
+            )
+            message_crew()        
+
+        self.status.set(t[4])
         self.time.set(t[2])
         self.crew.set(t[3])
         self.shtf.forget()
@@ -1529,6 +1559,8 @@ class main:
 
         Entry(self.tef, textvariable=self.crew, bd=5, font=("", 15)).grid(row=4, column=0)
         Button(self.tef, text="שנה כמות צוות", bd=3, font=("", 15), padx=1, pady=1, command=change_c, ).grid(row=4,column=1)
+        Entry(self.tef, textvariable=self.status, bd=5, font=("", 15)).grid(row=5, column=0)
+        Button(self.tef, text="שנה סטאטוס:", bd=3, font=("", 15), padx=1, pady=1, command=change_s, ).grid(row=5,column=1)
 
 
         Button(self.tef, text="חזור", bd=3, font=("", 15), padx=1, pady=1, command=back, ).grid(row=5, column=0)
@@ -1575,11 +1607,19 @@ class main:
             )
             message_crew()
 
+        def change_s():
+            TASK.update_status(self.prjNum.get(),self.taskId.get(),self.status.get())
+            Label(self.tef, text=self.status.get(), font=("", 20), pady=10, padx=10).grid(
+                row=2, column=0
+            )
+            message_crew()        
+
+        self.status.set(t[4])
         self.time.set(t[2])
         self.crew.set(t[3])
         self.shtf.forget()
 
-        Label(self.tef, text=":מזה משימה ", font=("", 20), pady=10, padx=10).grid(
+        Label(self.tef, text=":מזהה משימה ", font=("", 20), pady=10, padx=10).grid(
             row=0, column=1
         )
         Label(self.tef, text=self.taskId.get(), font=("", 20), pady=10, padx=10).grid(
@@ -1597,6 +1637,12 @@ class main:
         Label(self.tef, text=self.crew.get(), font=("", 20), pady=10, padx=10).grid(
             row=2, column=0
         )
+        Label(self.tef, text="סטאטוס חדש", font=("", 20), pady=10, padx=10).grid(
+            row=3, column=1
+        )
+        Label(self.tef, text=self.status.get(), font=("", 20), pady=10, padx=10).grid(
+            row=3, column=0
+        )
 
         Entry(self.tef, textvariable=self.time, bd=5, font=("", 15)).grid(row=3, column=0)
         Button(self.tef, text="שנה מספר שעות ", bd=3, font=("", 15), padx=1, pady=1, command=change_h, ).grid(row=3, column=1)
@@ -1604,6 +1650,10 @@ class main:
         Entry(self.tef, textvariable=self.crew, bd=5, font=("", 15)).grid(row=4, column=0)
         Button(self.tef, text="שנה כמות צוות", bd=3, font=("", 15), padx=1, pady=1, command=change_c, ).grid(row=4,column=1)
 
+        Entry(self.tef, textvariable=self.crew, bd=5, font=("", 15)).grid(row=4, column=0)
+        Button(self.tef, text="שנה סטאטוס", bd=3, font=("", 15), padx=1, pady=1, command=change_s, ).grid(row=4,column=1)
+
+        
 
         Button(self.tef, text="חזור", bd=3, font=("", 15), padx=1, pady=1, command=back, ).grid(row=5, column=0)
 
