@@ -652,6 +652,14 @@ class main:
             command=self.add_task_frame_developer,
         ).grid(row=1, column=1)
         Button(self.df,
+               text="עריכת משימות ",
+               bd=3,
+               font=("", 15),
+               padx=1,
+               pady=1,
+               command=self.task_editor_frame,
+               ).grid(row=1, column=4)
+        Button(self.df,
                text=" דף משימות ",
                bd=3,
                font=("", 15),
@@ -692,7 +700,7 @@ class main:
             pady=1,
             command=self.project_frame,
         ).grid(row=1, column=1)
-
+        
         self.messages(self.mf,2)
 
         self.mf.pack()
@@ -1060,6 +1068,7 @@ class main:
         Button(self.pef, text="חזור", bd=3, font=("", 15), padx=1, pady=1, command=back, ).grid(row=5, column=1)
 
         self.pef.pack()
+
 
 
 
