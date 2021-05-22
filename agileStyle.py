@@ -69,8 +69,8 @@ sql = '''CREATE TABLE IF NOT EXISTS projects
 cc.execute(sql)
 
 #sql = '''DROP TABLE project_tasks
- #         '''
- #cc.execute(sql)
+#          '''
+#cc.execute(sql)
 
 sql = '''CREATE TABLE IF NOT EXISTS project_tasks
          (projId text NOT NULL,
@@ -264,7 +264,7 @@ class PROJECT:
 
 # **************task class*********************************#
 class TASK:
-    def __init__(self, taskId, time, crewN, projId, status,priorty):
+    def __init__(self,taskId, time, crewN, projId, status,priorty):
         self.taskId = taskId
         self.time = time
         self.crewNum = crewN
@@ -275,9 +275,9 @@ class TASK:
     def insert_to_table(self):
         conect = sqlite3.connect('myDb.db')
         cc = conect.cursor()
-        sql = '''INSERT INTO project_tasks VALUES(?,?,?,?,?)
+        sql = '''INSERT INTO project_tasks VALUES(?,?,?,?,?,?)
          '''
-        dats_tuple = (self.projId, self.taskId, self.time, self.crewNum, self.status)
+        dats_tuple = (self.projId, self.taskId, self.time, self.crewNum, self.status,self.priorty)
 
         try:
             cc.execute(sql, dats_tuple)
