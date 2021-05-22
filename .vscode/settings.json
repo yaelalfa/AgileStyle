@@ -1,0 +1,14 @@
+{
+    "python.testing.unittestArgs": [
+        "-v",
+        "-s",
+        "./__pycache__",
+        "-p",
+        "*test.py"
+    ],
+    
+    "python.testing.unittestEnabled": true,
+    "python.testing.pytestArgs": [
+        "__pycache__"
+    ]
+}

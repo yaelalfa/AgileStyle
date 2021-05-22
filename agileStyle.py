@@ -63,9 +63,9 @@ cc = conect.cursor()
 #cc.execute(sql)
 # creat table
 sql = '''CREATE TABLE IF NOT EXISTS projects
-         (projId text PRIMARY KEY,
-          name text,
-          managerId text )'''
+    (projId text PRIMARY KEY,
+        name text,
+        managerId text )'''
 cc.execute(sql)
 
 #sql = '''DROP TABLE project_tasks
