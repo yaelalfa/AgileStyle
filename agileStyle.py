@@ -1496,7 +1496,7 @@ class main:
             self.task_frame()
 
         def add_task():
-            t = TASK(self.taskId.get(), self.time.get(), self.crew.get(), self.prjNum.get(), self.status.get())
+            t = TASK(self.taskId.get(), self.time.get(), self.crew.get(), self.prjNum.get(), self.status.get(),self.priorty.get())
             t.insert_to_table()
 
         Button(self.atf, text="חזור", bd=3, font=("", 15), padx=1, pady=1, command=back, ).grid(row=0, column=1)
@@ -1508,6 +1508,8 @@ class main:
         Entry(self.atf, textvariable=self.crew, bd=5, font=("", 15)).grid(row=3, column=0)
         Label(self.atf, text=":סטאטוס (IN PROGRES/DONE/DEF) ", font=("", 20), pady=10, padx=10).grid(row=4, column=1)
         Entry(self.atf, textvariable=self.status, bd=5, font=("", 15)).grid(row=4, column=0)
+        Label(self.atf, text=":עדיפות H/L/M ", font=("", 20), pady=10, padx=10).grid(row=5, column=1)
+        Entry(self.atf, textvariable=self.priorty, bd=5, font=("", 15)).grid(row=5, column=0)
         Button(
             self.atf,
             text="הוסף",
