@@ -39,7 +39,7 @@ conect = sqlite3.connect('myDb.db')
 
 # get a cursor to execute sql statements
 cc = conect.cursor()
-
+#sql= '''DROP TABLE project_tasks'''cc.execute(sql)
 # creat table
 sql = '''CREATE TABLE IF NOT EXISTS projects
          (projId text PRIMARY KEY,
@@ -51,6 +51,7 @@ sql = '''CREATE TABLE IF NOT EXISTS project_tasks
           taskId text NOT NULL,
           time text,
           crew text ,
+          status text,
           PRIMARY KEY (projId,taskId))
           '''
 cc.execute(sql)
@@ -733,6 +734,14 @@ class main:
                pady=5,
                command=self.login_frame,
                ).grid(row=4, column=0)
+        Button(self.cusf,
+               text=" מצב משימות ",
+               bd=3,
+               font=("", 15),
+               padx=5,
+               pady=5,
+               command=self.schema_cus,
+               ).grid(row=4, column=2)
         self.cusf.pack()
 
     ## tasks for developer page
