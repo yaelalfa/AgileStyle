@@ -1535,10 +1535,12 @@ class main:
             t = TASK(self.taskId.get(), self.time.get(), self.crew.get(), self.prjNum.get(), self.status.get(),self.priorty.get())
             t.insert_to_table()
 
-        Button(self.atf, text="חזור", bd=3, font=("", 15), padx=1, pady=1, command=self.developer_frame, ).grid(row=0,
+        Button(self.atf, text="חזור", bd=3, font=("", 15), padx=1, pady=1, command=self.developer_frame, ).grid(row=8,
                                                                                                                 column=1)
         Label(self.atf, text=":מזהה של משימה ", font=("", 20), pady=10, padx=10).grid(row=1, column=1)
         Entry(self.atf, textvariable=self.taskId, bd=5, font=("", 15)).grid(row=1, column=0)
+        Label(self.atf, text=":מזהה של פרוייקט ", font=("", 20), pady=10, padx=10).grid(row=6, column=1)
+        Entry(self.atf, textvariable=self.prjNum, bd=5, font=("", 15)).grid(row=6, column=0)
         Label(self.atf, text=":מספר שעות מוערך להשלמת משימה ", font=("", 20), pady=10, padx=10).grid(row=2, column=1)
         Entry(self.atf, textvariable=self.time, bd=5, font=("", 15)).grid(row=2, column=0)
         Label(self.atf, text=":מספר צוות דרוש ", font=("", 20), pady=10, padx=10).grid(row=3, column=1)
@@ -1881,30 +1883,30 @@ class main:
         Button(self.tfc, text="חזור", bd=3, font=("", 15), padx=1, pady=1, command=back, ).grid(row=1, column=1)
         
 
-        Label(self.tf, text="******************", font=("", 20), pady=10, padx=10).grid(row=7, column=0)
-        Label(self.tf, text="******************", font=("", 20), pady=10, padx=10).grid(row=7, column=1)
-        Label(self.tf, text="******************", font=("", 20), pady=10, padx=10).grid(row=7, column=2)
-        Label(self.tf, text="משימות קיימות בפרויקט", font=("", 20), pady=10, padx=10).grid(row=8, column=1)
+        Label(self.tfc, text="******************", font=("", 20), pady=10, padx=10).grid(row=7, column=0)
+        Label(self.tfc, text="******************", font=("", 20), pady=10, padx=10).grid(row=7, column=1)
+        Label(self.tfc, text="******************", font=("", 20), pady=10, padx=10).grid(row=7, column=2)
+        Label(self.tfc, text="משימות קיימות בפרויקט", font=("", 20), pady=10, padx=10).grid(row=8, column=1)
 
-        Label(self.tf, text="מזהה משימה", font=("", 20, 'underline'), pady=10, padx=10).grid(row=9, column=2)
-        Label(self.tf, text="מספר שעות מוערך", font=("", 20, 'underline'), pady=10, padx=10).grid(row=9, column=1)
-        Label(self.tf, text="מספר צוות דרוש", font=("", 20, 'underline'), pady=10, padx=10).grid(row=9, column=0)
+        Label(self.tfc, text="מזהה משימה", font=("", 20, 'underline'), pady=10, padx=10).grid(row=9, column=2)
+        Label(self.tfc, text="סטאטוס", font=("", 20, 'underline'), pady=10, padx=10).grid(row=9, column=1)
+        Label(self.tfc, text="מספר צוות דרוש", font=("", 20, 'underline'), pady=10, padx=10).grid(row=9, column=0)
         i = 10
         for t in tasks:
-            Label(self.tf, text="   " + t[1] + "   ", font=("", 20), pady=10, padx=10).grid(row=i, column=2)
-            Label(self.tf, text="   " + t[2] + "   ", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
-            Label(self.tf, text="   " + t[3] + "   ", font=("", 20), pady=10, padx=10).grid(row=i, column=0)
+            Label(self.tfc, text="   " + t[1] + "   ", font=("", 20), pady=10, padx=10).grid(row=i, column=2)
+            Label(self.tfc, text="   " + t[4] + "   ", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
+            Label(self.tfc, text="   " + t[3] + "   ", font=("", 20), pady=10, padx=10).grid(row=i, column=0)
             i = i + 1
 
-        Label(self.tf, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=2)
-        Label(self.tf, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
-        Label(self.tf, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=0)
+        Label(self.tfc, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=2)
+        Label(self.tfc, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
+        Label(self.tfc, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=0)
         i = i + 1
-        Label(self.tf, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=2)
-        Label(self.tf, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
-        Label(self.tf, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=0)
+        Label(self.tfc, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=2)
+        Label(self.tfc, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
+        Label(self.tfc, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=0)
 
-        self.tf.pack()
+        self.tfc.pack()
 
     #########end of task editor##############
 
