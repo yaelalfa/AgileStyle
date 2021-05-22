@@ -4,22 +4,22 @@ from tkinter import messagebox as ms
 import tkinter as tk
 import sqlite3
 
-import matplotlib
-import plotly.express as px
-import pandas as pd
-from dateutil.rrule import WEEKLY
-from matplotlib import font_manager
-from matplotlib.backends.backend_tkagg import (
-    FigureCanvasTkAgg, NavigationToolbar2Tk)
+#import matplotlib
+#import plotly.express as px
+#import pandas as pd
+#from dateutil.rrule import WEEKLY
+#from matplotlib import font_manager
+#from matplotlib.backends.backend_tkagg import (
+#    FigureCanvasTkAgg, NavigationToolbar2Tk)
 # Implement the default Matplotlib key bindings.
-from matplotlib.backend_bases import key_press_handler
-from matplotlib.dates import rrulewrapper, DateFormatter, RRuleLocator
-from matplotlib.figure import Figure
-import matplotlib.pyplot as plt
+#from matplotlib.backend_bases import key_press_handler
+#from matplotlib.dates import rrulewrapper, DateFormatter, RRuleLocator
+#from matplotlib.figure import Figure
+#import matplotlib.pyplot as plt
 
-import numpy as np
+#import numpy as np
 
-from typing import List, Any
+#from typing import List, Any
 
 # from docx import Document
 # from docx.shared import Inches
@@ -27,11 +27,11 @@ from typing import List, Any
 import os
 
 # make database and users (if not exists already) table at programme start up
-import numpy
+#import numpy
 import datetime as dt
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from matplotlib.figure import Figure
-from pandas import DataFrame
+#from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+#from matplotlib.figure import Figure
+# pandas import DataFrame
 
 users = sqlite3.connect("users.db")
 
@@ -782,7 +782,7 @@ class main:
                font=("", 15),
                padx=5,
                pady=5,
-               command=self.schema_cus,
+               command=self.show_proj_frame,
                ).grid(row=4, column=2)
         self.cusf.pack()
 
@@ -1606,7 +1606,7 @@ class main:
         Button(self.tef, text="שנה סטאטוס:", bd=3, font=("", 15), padx=1, pady=1, command=change_s, ).grid(row=5,
                                                                                                            column=1)
 
-        Button(self.tef, text="חזור", bd=3, font=("", 15), padx=1, pady=1, command=back, ).grid(row=5, column=0)
+        Button(self.tef, text="חזור", bd=3, font=("", 15), padx=1, pady=1, command=back, ).grid(row=6, column=0)
 
         self.tef.pack()
 
