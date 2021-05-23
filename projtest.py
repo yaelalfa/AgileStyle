@@ -52,6 +52,6 @@ class PROJECT:
     
 def test_get_project():
     project = PROJECT(projId="4",name="aa",us="linm")
-    assert project.get_ID(proj_id="4")=="linm"
+    assert project.get_ID(proj_id="4") == "linm"
         
         
