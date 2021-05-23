@@ -16,18 +16,18 @@ class PROJECT:
                             """
                             
         dt = (proj_id)
-        try:
-            cc.execute(sql, dt)
-            row = cc.fetchone()
+        
+        cc.execute(sql, dt)
+        row = cc.fetchone()
 
-            return row
+        return row
 
 
 
-        except Exception:
-            ms.showerror("שגיאה", "שגיאה בזמן משיכת פרויקט")
-        connect.commit()
-        connect.close()
+    
+            
+    
+    
                             
     @classmethod
     def get_project(cls, manger_id, proj_id):
@@ -41,19 +41,15 @@ class PROJECT:
                             """
 
         dt = (manger_id, proj_id)
-        try:
-            cc.execute(sql, dt)
-            row = cc.fetchone()
+    
+        cc.execute(sql, dt)
+        row = cc.fetchone()
 
-            return row
+        return row
 
 
 
-        except Exception:
-            ms.showerror("שגיאה", "שגיאה בזמן משיכת פרויקט")
-        connect.commit()
-        connect.close()
-
+    
 def test_get_project():
     project = PROJECT(projId="4",name="aa",us="linm")
     assert project.get_ID(proj_id="4")=="linm"
