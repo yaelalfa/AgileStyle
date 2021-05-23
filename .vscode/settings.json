@@ -2,13 +2,14 @@
     "python.testing.unittestArgs": [
         "-v",
         "-s",
-        "./__pycache__",
+        "./Jenkins",
         "-p",
         "*test.py"
     ],
-    
-    "python.testing.unittestEnabled": true,
+    "python.testing.pytestEnabled": False,
+    "python.testing.nosetestsEnabled": False,
+    "python.testing.unittestEnabled": True,
     "python.testing.pytestArgs": [
-        "__pycache__"
+        "Jenkins"
     ]
 }
