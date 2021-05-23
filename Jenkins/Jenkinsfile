@@ -1,4 +1,4 @@
-pipeline {
+pipeline{
     agent none
     stages {
         stage('Build') {
@@ -12,7 +12,7 @@ pipeline {
                 sh 'python -m py_compile agileStyle.py'
             }
         }
- 
+
         stage('Test') {
             agent {
                 docker {
@@ -34,27 +34,26 @@ pipeline {
         }
         stage('Integration Test') {
                     steps{
-                         sh 'mvn -s ../configuration/settings.xml -B clean test'
+                        sh 'mvn -s ../configuration/settings.xml -B clean test'
                     }
                     post{
                         always{
-                              junit 'target/surefire-reports/*.xml' 
+                            junit 'target/surefire-reports/*.xml' 
                         }
                     }       
         }
-                           
-                           
+                    
     }      
     post {
         failure{
-               mail to:"yaelal@ac.sce.ac.il",
-               subject: "Failed: Job",
-               body: "Failed"
+                mail to:"yaelal@ac.sce.ac.il",
+                subject: "Failed: Job",
+                body: "Failed"
         }
         success{
-               mail to:"yaelal@ac.sce.ac.il",
-               subject: "Success: Job",
-               body: "Success"
+                mail to:"yaelal@ac.sce.ac.il",
+                subject: "Success: Job",
+                body: "Success"
         }
     } 
 }
