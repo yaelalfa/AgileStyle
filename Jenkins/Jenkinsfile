@@ -46,12 +46,12 @@ pipeline{
     }      
     post {
         failure{
-                mail to:"yaelal@ac.sce.ac.il",
+                mail to:"yaelal@ac.sce.ac.il,nuransh@ac.sce.ac.il",
                 subject: "Failed: Job",
                 body: "Failed"
         }
         success{
-                mail to:"yaelal@ac.sce.ac.il",
+                mail to:"yaelal@ac.sce.ac.il,nuransh@ac.sce.ac.il",
                 subject: "Success: Job",
                 body: "Success"
         }
