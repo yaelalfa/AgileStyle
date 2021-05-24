@@ -80,6 +80,7 @@ sql = '''CREATE TABLE IF NOT EXISTS project_tasks
           crew VARCHAR(255) ,
           status VARCHAR(255),
           priorty VARCHAR(255),
+          description VARCHAR(255),
           PRIMARY KEY (projId,taskId))
           '''
 cc.execute(sql)
@@ -188,7 +189,7 @@ class PROJECT:
     
 
     @classmethod
-    def get_projects(cls, manger_id):
+    def get_projects(cls, manger_id):  #get projects by manager id (username)
         connect = users
         cc = connect.cursor(buffered=True)
         sql = """SELECT * FROM projects 
@@ -210,7 +211,7 @@ class PROJECT:
         
 
     @classmethod
-    def get_project(cls, manger_id, proj_id):
+    def get_project(cls, manger_id, proj_id):  #get project by manager id and project id
         connect = users
         cc = connect.cursor(buffered=True)
         sql = """SELECT * FROM projects 
@@ -252,7 +253,26 @@ class PROJECT:
 
             return row
 
+        except Exception:
+            ms.showerror("שגיאה", "שגיאה בזמן משיכת פרויקט")
+        connect.commit()
 
+    @classmethod
+    def get_project_by_projId(cls, proj_id):
+        connect = users
+        cc = connect.cursor(buffered=True)
+        sql = """SELECT * FROM projects 
+                                   WHERE  projId=%s
+
+
+                                   """
+
+        dt = (proj_id,)
+        try:
+            cc.execute(sql, dt)
+            row = cc.fetchone()
+
+            return row
 
         except Exception:
             ms.showerror("שגיאה", "שגיאה בזמן משיכת פרויקט")
@@ -262,20 +282,21 @@ class PROJECT:
 
 # **************task class*********************************#
 class TASK:
-    def __init__(self,taskId, time, crewN, projId, status,priorty):
+    def __init__(self,taskId, time, crewN, projId, status,priorty,description):
         self.taskId = taskId
         self.time = time
         self.crewNum = crewN
         self.projId = projId
         self.status = status
         self.priorty=priorty
+        self.description=description
 
     def insert_to_table(self):
         conect =users
         cc = conect.cursor(buffered=True)
-        sql = '''INSERT INTO project_tasks VALUES(%s,%s,%s,%s,%s,%s)
+        sql = '''INSERT INTO project_tasks VALUES(%s,%s,%s,%s,%s,%s,%s)
          '''
-        dats_tuple = (self.projId, self.taskId, self.time, self.crewNum, self.status,self.priorty)
+        dats_tuple = (self.projId, self.taskId, self.time, self.crewNum, self.status,self.priorty,self.description)
 
         try:
             cc.execute(sql, dats_tuple)
@@ -438,6 +459,30 @@ class TASK:
         connect.commit()
 
 
+
+    @classmethod
+    def update_description(cls, pid, tid, des):
+        connect =users
+        cc = connect.cursor(buffered=True)
+
+        sql = """UPDATE project_tasks
+                        SET description=%s
+                        where  projId=%s  
+                        AND taskId=%s    
+
+                                        """
+        dt = (des, pid, tid)
+
+        try:
+
+            cc.execute(sql, dt)
+            ms.showinfo("","תיאור משימה עודכן בהצלחה ")
+        except Exception:
+            ms.showerror("error", "שגיאה בתיאור משימה  ")
+
+        connect.commit()
+
+
 # **************end of task class*********************************#
 
 
@@ -489,6 +534,26 @@ class PROJECT_CREW:
         row = cc.fetchone()
         print(row)
         return row
+
+
+    @classmethod
+    def get_developer_projects(cls, user):
+        conect = users
+        cc = conect.cursor(buffered=True)
+        sql = '''SELECT * FROM project_crew 
+                 WHERE user=%s
+             '''
+        dats_tuple = (user,)
+
+        try:
+            cc.execute(sql, dats_tuple)
+            rows = cc.fetchall()
+            return rows
+
+        except Exception:
+            ms.showerror("שגיאה", "נסיון למשוך פרויקטים נכשל")
+
+        conect.commit()
 
     
 # ************end of project crew class**********************************#
@@ -579,6 +644,7 @@ class main:
         self.crew = StringVar()
         self.user_crew = StringVar()
         self.status = StringVar()
+        self.description=StringVar()
 
     # Login Function
     def login(self):
@@ -701,40 +767,18 @@ class main:
         self.atf.pack_forget()
 
         self.head["text"] = "מפתח"
-        self.df.pack()
+
         Button(
             self.df,
-            text="הוספת משימות",
+            text="פרויקטים",
             bd=3,
             font=("", 15),
             padx=1,
             pady=1,
-            command=self.add_task_frame_developer,
-        ).grid(row=1, column=2)
-        Button(self.df,
-               text="עריכת משימות ",
-               bd=3,
-               font=("", 15),
-               padx=1,
-               pady=1,
-               command=self.task_editor_frame_developer,
-               ).grid(row=1, column=0)
-        Button(self.df,
-               text="מחיקת משימות ",
-               bd=3,
-               font=("", 15),
-               padx=1,
-               pady=1,
-               command=self.remove_task_frame_developer,
-               ).grid(row=1, column=4)
-        Button(self.df,
-               text=" דף משימות ",
-               bd=3,
-               font=("", 15),
-               padx=5,
-               pady=5,
-               command=self.all_teammates_task,
-               ).grid(row=4, column=2)
+            command=self.d_project_frame,
+        ).grid(row=0, column=0)
+
+
         Button(self.df,
                text=" סכימה ",
                bd=3,
@@ -751,8 +795,14 @@ class main:
                pady=5,
                command=self.login_frame,
                ).grid(row=4, column=0)
+
+
+
+
         self.messages(self.df, 2)
         self.df.pack()
+
+
 
     def maneger_frame(self):
         self.logf.pack_forget()
@@ -769,7 +819,7 @@ class main:
             command=self.project_frame,
         ).grid(row=1, column=1)
 
-        self.messages(self.mf, 2)
+
         Button(self.mf,
                text=" להתנתק ",
                bd=3,
@@ -777,8 +827,9 @@ class main:
                padx=5,
                pady=5,
                command=self.login_frame,
-               ).grid(row=4, column=0)
+               ).grid(row=2, column=1)
 
+        self.messages(self.mf, 3)
         self.mf.pack()
 
     def custumer_frame(self):
@@ -1094,7 +1145,7 @@ class main:
         self.tfc = Frame(self.master, padx=20, pady=30)  # task frame custumer
         self.atf = Frame(self.master, padx=20, pady=30)  # add task frame
         self.shtf = Frame(self.master, padx=20, pady=30)  # show task frame
-        self.tef = Frame(self.master, padx=20, pady=30)  # task editor frame
+        self.dtef = Frame(self.master, padx=20, pady=30)  # task editor frame
 
         self.spf = Frame(self.master, padx=20, pady=30)  # show project frame
         self.pef = Frame(self.master, padx=20, pady=30)  # project editor frame
@@ -1107,11 +1158,420 @@ class main:
         self.scc = Frame(self.master, padx=20, pady=100)  # customer schema frame
         self.iframe5 = Frame(self.master, bd=2, relief=RAISED)
 
+        self.dpf = Frame(self.master, padx=20, pady=30)  # developer project frame
+        self.dspf = Frame(self.master, padx=20, pady=30)  # developer show project frame
+        self.dpef = Frame(self.master, padx=20, pady=30)  # developer project editor frame
+        self.dtf = Frame(self.master, padx=20, pady=30)  # developer task frame
+        self.datf = Frame(self.master, padx=20, pady=30)  # developer add task frame
+        self.drtf = Frame(self.master, padx=20, pady=30)  # remove task frame
+        self.dtef = Frame(self.master, padx=20, pady=30)  # developer task editor frame
+        self.dshtf = Frame(self.master, padx=20, pady=30)  # developer show task frame
+
+###############developer funcs########################
+    def d_project_frame(self):
+        my_p=PROJECT_CREW.get_developer_projects(self.username.get())
+
+        self.df.forget()
+        self.head["text"] ="פרויקטים"
+
+        def back():
+            self.dpf.forget()
+            self.developer_frame()
+
+        Button(
+            self.dpf,
+            text="חזור",
+            bd=3,
+            font=("", 15),
+            padx=1,
+            pady=1,
+            command=back, ).grid(row=0, column=1)
+
+        Button(
+            self.dpf,
+            text="הצג פרויקט",
+            bd=3,
+            font=("", 15),
+            padx=1,
+            pady=1,
+            command=self.dev_show_proj_frame, ).grid(row=1, column=1)
+
+
+        i=5
+        Label(self.dpf, text="*****************", font=("", 20), pady=10, padx=10).grid(row=i, column=0)
+        Label(self.dpf, text="*****************", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
+        i=i+1
+        Label(self.dpf, text="הפרויקטים אליהם אתה משוייך", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
+        i=i+1
+
+        Label(self.dpf, text="שם הפרויקט", font=("", 20, 'underline'), pady=10, padx=10).grid(row=i, column=0)
+        Label(self.dpf, text="מזהה הפרויקט", font=("", 20, 'underline'), pady=10, padx=10).grid(row=i, column=1)
+        i = i + 1
+        for p in my_p:
+            proj=PROJECT.get_project_by_projId(p[0])
+            Label(self.dpf, text="   " + proj[1] + "   ", font=("", 20), pady=10, padx=10).grid(row=i, column=0)
+            Label(self.dpf, text="   " + proj[0] + "    ", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
+            i = i + 1
+
+        self.dpf.pack()
+
+    def dev_show_proj_frame(self):
+        def back():
+            self.dspf.forget()
+            self.d_project_frame()
+
+        def chek_proj():
+            projs=PROJECT_CREW.get_developer_projects(self.username.get())
+            for p in projs:
+                if p[0]== self.prjNum.get():
+                    self.dev_proj_editor_frame()
+
+
+
+
+
+
+        self.dpf.forget()
+        self.head["text"] = "הצגת פרויקט"
+        Label(self.dspf, text="מספר מזהה של פרויקט: ", font=("", 20), pady=10, padx=10).grid(
+            row=0, column=1
+        )
+        Entry(self.dspf, textvariable=self.prjNum, bd=5, font=("", 15)).grid(
+            row=0, column=0
+        )
+        Button(
+            self.dspf,
+            text="הצג",
+            bd=3,
+            font=("", 15),
+            padx=1,
+            pady=1,
+            command=chek_proj, ).grid(row=2, column=1)
+
+        Button(
+            self.dspf,
+            text="חזור",
+            bd=3,
+            font=("", 15),
+            padx=1,
+            pady=1,
+            command=back, ).grid(row=3, column=1)
+
+        self.dspf.pack()
+
+
+
+    def dev_proj_editor_frame(self):
+        proj = PROJECT.get_project_by_projId(self.prjNum.get())
+        if not proj:
+            ms.showerror("שגיאה", "הפרויקט המבוקש לא נמצא")
+            return
+
+        self.dspf.forget()
+
+        def back():
+            self.dpef.forget()
+            self.dev_project_frame()
+
+        Label(self.dpef, text=":שם הפרויקט ", font=("", 20), pady=10, padx=10).grid(row=1, column=1)
+        Label(self.dpef, text=proj[1], font=("", 20), pady=10, padx=10).grid(row=1, column=0)
+        Label(self.dpef, text=":מזהה הפרויקט ", font=("", 20), pady=10, padx=10).grid(row=2, column=1)
+        Label(self.dpef, text=proj[0], font=("", 20), pady=10, padx=10).grid(row=2, column=0)
+        Label(self.dpef, text=":מנהל הפרויקט ", font=("", 20), pady=10, padx=10).grid(row=3, column=1)
+        Label(self.dpef, text=proj[2], font=("", 20), pady=10, padx=10).grid(row=3, column=0)
+
+
+        Button(self.dpef, text="משימות", bd=3, font=("", 15), padx=1, pady=1, command=self.dev_task_frame, ).grid(row=4,
+                                                                                                             column=1)
+        self.prjName.set(proj[1])
+        self.prjNum.set(proj[0])
+
+
+        Button(self.dpef, text="חזור", bd=3, font=("", 15), padx=1, pady=1, command=back, ).grid(row=5, column=1)
+
+        self.dpef.pack()
+
+
+
+    def dev_task_frame(self):
+        self.dpef.forget()
+
+        tasks = TASK.get_tasks(self.prjNum.get())
+
+        def back():
+            self.dtf.forget()
+            self.dev_proj_editor_frame()
+
+        self.head["text"] = "ניהול משימות"
+        Label(self.dtf, text=":משימות של הפרויקט ", font=("", 20), pady=10, padx=10).grid(row=0, column=1)
+        Label(self.dtf, text=self.prjName.get(), font=("", 20), pady=10, padx=10).grid(row=0, column=0)
+
+        Button(self.dtf, text="חזור", bd=3, font=("", 15), padx=1, pady=1, command=back, ).grid(row=1, column=1)
+        Button(self.dtf, text="הוסף משימה", bd=3, font=("", 15), padx=1, pady=1, command=self.dev_add_task_frame, ).grid(
+            row=2, column=1)
+        Button(self.dtf, text="הצג משימה", bd=3, font=("", 15), padx=1, pady=1, command=self.dev_show_task_frame, ).grid(
+            row=3, column=1)
+        Button(self.dtf, text="מחק משימה", bd=3, font=("", 15), padx=1, pady=1, command=self.dev_remove_task_frame, ).grid(
+            row=4, column=1)
+
+        Label(self.dtf, text="******************", font=("", 20), pady=10, padx=10).grid(row=7, column=0)
+        Label(self.dtf, text="******************", font=("", 20), pady=10, padx=10).grid(row=7, column=1)
+        Label(self.dtf, text="******************", font=("", 20), pady=10, padx=10).grid(row=7, column=2)
+        Label(self.dtf, text="משימות הקיימות בפרויקט", font=("", 20), pady=10, padx=10).grid(row=8, column=1)
+
+        Label(self.dtf, text="מזהה משימה", font=("", 20, 'underline'), pady=10, padx=10).grid(row=9, column=2)
+        Label(self.dtf, text="תאור", font=("", 20, 'underline'), pady=10, padx=10).grid(row=9, column=1)
+
+        i = 10
+        for t in tasks:
+            Label(self.dtf, text="   " + t[1] + "   ", font=("", 20), pady=10, padx=10).grid(row=i, column=2)
+            Label(self.dtf, text="   " + t[6] + "   ", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
+            i = i + 1
+
+        Label(self.dtf, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=2)
+        Label(self.dtf, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
+
+        i = i + 1
+
+        Label(self.dtf, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
+        Label(self.dtf, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=0)
+
+        self.dtf.pack()
+
+
+
+    def dev_add_task_frame(self):
+        self.dtf.forget()
+
+        def back():
+            self.datf.forget()
+            self.dev_task_frame()
+
+        def add_task():
+            t = TASK(self.taskId.get(), self.time.get(), self.crew.get(), self.prjNum.get(), self.status.get(),self.priorty.get(),self.description.get())
+            t.insert_to_table()
+
+        Button(self.datf, text="חזור", bd=3, font=("", 15), padx=1, pady=1, command=back, ).grid(row=0, column=1)
+        Label(self.datf, text=":מזהה של משימה ", font=("", 20), pady=10, padx=10).grid(row=1, column=1)
+        Entry(self.datf, textvariable=self.taskId, bd=5, font=("", 15)).grid(row=1, column=0)
+        Label(self.datf, text=":מספר שעות מוערך להשלמת משימה ", font=("", 20), pady=10, padx=10).grid(row=2, column=1)
+        Entry(self.datf, textvariable=self.time, bd=5, font=("", 15)).grid(row=2, column=0)
+        Label(self.datf, text=":מספר צוות דרוש ", font=("", 20), pady=10, padx=10).grid(row=3, column=1)
+        Entry(self.datf, textvariable=self.crew, bd=5, font=("", 15)).grid(row=3, column=0)
+        Label(self.datf, text=":סטאטוס (IN PROGRES/DONE/DEF) ", font=("", 20), pady=10, padx=10).grid(row=4, column=1)
+        Entry(self.datf, textvariable=self.status, bd=5, font=("", 15)).grid(row=4, column=0)
+        Label(self.datf, text=":עדיפות H/L/M ", font=("", 20), pady=10, padx=10).grid(row=5, column=1)
+        Entry(self.datf, textvariable=self.priorty, bd=5, font=("", 15)).grid(row=5, column=0)
+        Label(self.datf, text=":תיאור המשימה ", font=("", 20), pady=10, padx=10).grid(row=6, column=1)
+        Entry(self.datf, textvariable=self.description, bd=5, font=("", 15)).grid(row=6, column=0)
+        Button(
+            self.datf,
+            text="הוסף",
+            bd=3,
+            font=("", 15),
+            padx=1,
+            pady=1,
+            command=add_task,
+        ).grid(row=7, column=0)
+
+        self.head["text"] = "הוספת משימה"
+        self.datf.pack()
+
+
+    def dev_remove_task_frame(self):
+        self.dtf.forget()
+
+        def back():
+            self.drtf.forget()
+            self.dev_task_frame()
+
+        def remove():
+            TASK.delet_task(self.prjNum.get(), self.taskId.get())
+
+        Button(self.drtf, text="חזור", bd=3, font=("", 15), padx=1, pady=1, command=back, ).grid(row=3, column=0)
+
+        Label(self.drtf, text=":מזהה של משימה ", font=("", 20), pady=10, padx=10).grid(
+            row=1, column=1
+        )
+        Entry(self.drtf, textvariable=self.taskId, bd=5, font=("", 15)).grid(
+            row=1, column=0
+        )
+
+        Button(
+            self.drtf,
+            text="מחק",
+            bd=3,
+            font=("", 15),
+            padx=1,
+            pady=1,
+            command=remove,
+        ).grid(row=2, column=0)
+
+        self.drtf.pack()
+
+
+
+    def dev_show_task_frame(self):
+        def back():
+            self.dshtf.forget()
+            self.dev_task_frame()
+
+        self.dtf.forget()
+
+        Button(self.dshtf, text="חזור", bd=3, font=("", 15), padx=1, pady=1, command=back, ).grid(row=3, column=0)
+
+        Label(self.dshtf, text=":מזהה של משימה ", font=("", 20), pady=10, padx=10).grid(
+            row=1, column=1
+        )
+        Entry(self.dshtf, textvariable=self.taskId, bd=5, font=("", 15)).grid(
+            row=1, column=0
+        )
+
+        Button(
+            self.dshtf,
+            text="הצג",
+            bd=3,
+            font=("", 15),
+            padx=1,
+            pady=1,
+            command=self.dev_task_editor_frame,
+        ).grid(row=2, column=0)
+
+        self.dshtf.pack()
+
+    def dev_task_editor_frame(self):
+        t = TASK.get_task(self.taskId.get(), self.prjNum.get())
+        if not t:
+            ms.showerror("error", "המשימה המבוקשת לא נמצאת")
+            return
+
+        def back():
+            self.dtef.forget()
+            self.dev_task_frame()
+
+        def message_crew():
+            crew = PROJECT_CREW.get_crew(self.prjNum.get())
+            msg = "בפרויקט מספר "
+            msg += self.prjNum.get()
+            msg += "יש שינוי במשימה "
+            msg += self.taskId.get()
+
+            for c in crew:
+                MESSAGE.new_message(self.username.get(), c[1], msg)
+            MESSAGE.printAll()
+
+        def change_h():
+            TASK.update_hour(self.prjNum.get(), self.taskId.get(), self.time.get())
+            Label(self.dtef, text=self.time.get(), font=("", 20), pady=10, padx=10).grid(
+                row=1, column=0
+            )
+            message_crew()
+
+        def change_c():
+            TASK.update_crew(self.prjNum.get(), self.taskId.get(), self.crew.get())
+            Label(self.dtef, text=self.crew.get(), font=("", 20), pady=10, padx=10).grid(
+                row=2, column=0
+            )
+            message_crew()
+
+        def change_s():
+            TASK.update_status(self.prjNum.get(), self.taskId.get(), self.status.get())
+            Label(self.dtef, text=self.status.get(), font=("", 20), pady=10, padx=10).grid(
+                row=3, column=0
+            )
+            message_crew()
+
+        def change_d():
+            TASK.update_description(self.prjNum.get(), self.taskId.get(), self.description.get())
+            Label(self.dtef, text=self.description.get(), font=("", 20), pady=10, padx=10).grid(
+                row=5, column=0
+            )
+            message_crew()
+
+        self.time.set(t[2])
+        self.crew.set(t[3])
+        self.status.set(t[4])
+        self.priorty.set(t[5])
+        self.description.set(t[6])
+        self.dshtf.forget()
+
+        Label(self.dtef, text=":מזהה משימה ", font=("", 20), pady=10, padx=10).grid(
+            row=0, column=1
+        )
+        Label(self.dtef, text=self.taskId.get(), font=("", 20), pady=10, padx=10).grid(
+            row=0, column=0
+        )
+        Label(self.dtef, text=":מספר שעות מוערך להשלמת משימה ", font=("", 20), pady=10, padx=10).grid(
+            row=1, column=1
+        )
+        Label(self.dtef, text=self.time.get(), font=("", 20), pady=10, padx=10).grid(
+            row=1, column=0
+        )
+        Label(self.dtef, text=":כמות אנשי צוות דרוש ", font=("", 20), pady=10, padx=10).grid(
+            row=2, column=1
+        )
+        Label(self.dtef, text=self.crew.get(), font=("", 20), pady=10, padx=10).grid(
+            row=2, column=0
+        )
+        Label(self.dtef, text=" :סטאטוס", font=("", 20), pady=10, padx=10).grid(
+            row=3, column=1
+        )
+        Label(self.dtef, text=self.status.get(), font=("", 20), pady=10, padx=10).grid(
+            row=3, column=0
+        )
+        Label(self.dtef, text=" :סטאטוס", font=("", 20), pady=10, padx=10).grid(
+            row=3, column=1
+        )
+        Label(self.dtef, text=self.status.get(), font=("", 20), pady=10, padx=10).grid(
+            row=3, column=0
+        )
+        Label(self.dtef, text=" :עדיפות", font=("", 20), pady=10, padx=10).grid(
+            row=4, column=1
+        )
+        Label(self.dtef, text=self.priorty.get(), font=("", 20), pady=10, padx=10).grid(
+            row=4, column=0
+        )
+
+        Label(self.dtef, text=" :תיאור", font=("", 20), pady=10, padx=10).grid(
+            row=5, column=1
+        )
+        Label(self.dtef, text=self.description.get(), font=("", 20), pady=10, padx=10).grid(
+            row=5, column=0
+        )
+
+        Entry(self.dtef, textvariable=self.time, bd=5, font=("", 15)).grid(row=7, column=0)
+        Button(self.dtef, text="שנה מספר שעות ", bd=3, font=("", 15), padx=1, pady=1, command=change_h, ).grid(row=7,
+                                                                                                               column=1)
+
+        Entry(self.dtef, textvariable=self.crew, bd=5, font=("", 15)).grid(row=8, column=0)
+        Button(self.dtef, text="שנה כמות צוות", bd=3, font=("", 15), padx=1, pady=1, command=change_c, ).grid(row=8,
+                                                                                                              column=1)
+
+        Entry(self.dtef, textvariable=self.crew, bd=5, font=("", 15)).grid(row=9, column=0)
+        Button(self.dtef, text="שנה סטאטוס", bd=3, font=("", 15), padx=1, pady=1, command=change_s, ).grid(row=9,
+                                                                                                           column=1)
+
+        Entry(self.dtef, textvariable=self.description, bd=5, font=("", 15)).grid(row=10, column=0)
+        Button(self.dtef, text="שנה תיאור", bd=3, font=("", 15), padx=1, pady=1, command=change_d, ).grid(row=10,
+                                                                                                          column=1)
+
+        Button(self.dtef, text="חזור", bd=3, font=("", 15), padx=1, pady=1, command=back, ).grid(row=11, column=0)
+
+        self.dtef.pack()
+
+###############end developer funcs########################
+
+
+
+
+
+
     ##################project editor functions##############################
 
     def project_frame(self):
         self.mf.forget()
         projects = PROJECT.get_projects(self.username.get())
+
 
         def back():
             self.pf.forget()
@@ -1291,6 +1751,8 @@ class main:
         self.prjName.set(proj[1])
         Button(self.pefc, text="חזור", bd=3, font=("", 15), padx=1, pady=1, command=back, ).grid(row=5, column=1)
         self.pefc.pack()
+
+
     
     def crew_frame(self):
         self.pef.forget()
@@ -1494,7 +1956,7 @@ class main:
             self.task_frame()
 
         def add_task():
-            t = TASK(self.taskId.get(), self.time.get(), self.crew.get(), self.prjNum.get(), self.status.get(),self.priorty.get())
+            t = TASK(self.taskId.get(), self.time.get(), self.crew.get(), self.prjNum.get(), self.status.get(),self.priorty.get(),self.description.get())
             t.insert_to_table()
 
         Button(self.atf, text="חזור", bd=3, font=("", 15), padx=1, pady=1, command=back, ).grid(row=0, column=1)
@@ -1508,6 +1970,8 @@ class main:
         Entry(self.atf, textvariable=self.status, bd=5, font=("", 15)).grid(row=4, column=0)
         Label(self.atf, text=":עדיפות H/L/M ", font=("", 20), pady=10, padx=10).grid(row=5, column=1)
         Entry(self.atf, textvariable=self.priorty, bd=5, font=("", 15)).grid(row=5, column=0)
+        Label(self.atf, text=":תיאור המשימה ", font=("", 20), pady=10, padx=10).grid(row=6, column=1)
+        Entry(self.atf, textvariable=self.description, bd=5, font=("", 15)).grid(row=6, column=0)
         Button(
             self.atf,
             text="הוסף",
@@ -1516,7 +1980,7 @@ class main:
             padx=1,
             pady=1,
             command=add_task,
-        ).grid(row=6, column=0)
+        ).grid(row=7, column=0)
 
         self.head["text"] = "הוספת משימה"
         self.atf.pack()
@@ -1629,7 +2093,7 @@ class main:
             return
 
         def back():
-            self.tef.forget()
+            self.dtef.forget()
             self.developer_frame
 
         def message_crew():
@@ -1645,21 +2109,21 @@ class main:
 
         def change_h():
             TASK.update_hour(self.prjNum.get(), self.taskId.get(), self.time.get())
-            Label(self.tef, text=self.time.get(), font=("", 20), pady=10, padx=10).grid(
+            Label(self.dtef, text=self.time.get(), font=("", 20), pady=10, padx=10).grid(
                 row=1, column=0
             )
             message_crew()
 
         def change_c():
             TASK.update_crew(self.prjNum.get(), self.taskId.get(), self.crew.get())
-            Label(self.tef, text=self.crew.get(), font=("", 20), pady=10, padx=10).grid(
+            Label(self.dtef, text=self.crew.get(), font=("", 20), pady=10, padx=10).grid(
                 row=2, column=0
             )
             message_crew()
 
         def change_s():
             TASK.update_status(self.prjNum.get(), self.taskId.get(), self.status.get())
-            Label(self.tef, text=self.crew.get(), font=("", 20), pady=10, padx=10).grid(
+            Label(self.dtef, text=self.crew.get(), font=("", 20), pady=10, padx=10).grid(
                 row=2, column=0
             )
             message_crew()
@@ -1669,39 +2133,39 @@ class main:
         self.crew.set(t[3])
         self.shtf.forget()
 
-        Label(self.tef, text=":מזה משימה ", font=("", 20), pady=10, padx=10).grid(
+        Label(self.dtef, text=":מזה משימה ", font=("", 20), pady=10, padx=10).grid(
             row=0, column=1
         )
-        Label(self.tef, text=self.taskId.get(), font=("", 20), pady=10, padx=10).grid(
+        Label(self.dtef, text=self.taskId.get(), font=("", 20), pady=10, padx=10).grid(
             row=0, column=0
         )
-        Label(self.tef, text=":מספר שעות מוערך להשלמת משימה ", font=("", 20), pady=10, padx=10).grid(
+        Label(self.dtef, text=":מספר שעות מוערך להשלמת משימה ", font=("", 20), pady=10, padx=10).grid(
             row=1, column=1
         )
-        Label(self.tef, text=self.time.get(), font=("", 20), pady=10, padx=10).grid(
+        Label(self.dtef, text=self.time.get(), font=("", 20), pady=10, padx=10).grid(
             row=1, column=0
         )
-        Label(self.tef, text=":כמות אנשי צוות דרוש ", font=("", 20), pady=10, padx=10).grid(
+        Label(self.dtef, text=":כמות אנשי צוות דרוש ", font=("", 20), pady=10, padx=10).grid(
             row=2, column=1
         )
-        Label(self.tef, text=self.crew.get(), font=("", 20), pady=10, padx=10).grid(
+        Label(self.dtef, text=self.crew.get(), font=("", 20), pady=10, padx=10).grid(
             row=2, column=0
         )
 
-        Entry(self.tef, textvariable=self.time, bd=5, font=("", 15)).grid(row=3, column=0)
-        Button(self.tef, text="שנה מספר שעות ", bd=3, font=("", 15), padx=1, pady=1, command=change_h, ).grid(row=3,
+        Entry(self.dtef, textvariable=self.time, bd=5, font=("", 15)).grid(row=3, column=0)
+        Button(self.dtef, text="שנה מספר שעות ", bd=3, font=("", 15), padx=1, pady=1, command=change_h, ).grid(row=3,
+                                                                                                               column=1)
+
+        Entry(self.dtef, textvariable=self.crew, bd=5, font=("", 15)).grid(row=4, column=0)
+        Button(self.dtef, text="שנה כמות צוות", bd=3, font=("", 15), padx=1, pady=1, command=change_c, ).grid(row=4,
                                                                                                               column=1)
+        Entry(self.dtef, textvariable=self.status, bd=5, font=("", 15)).grid(row=5, column=0)
+        Button(self.dtef, text="שנה סטאטוס:", bd=3, font=("", 15), padx=1, pady=1, command=change_s, ).grid(row=5,
+                                                                                                            column=1)
 
-        Entry(self.tef, textvariable=self.crew, bd=5, font=("", 15)).grid(row=4, column=0)
-        Button(self.tef, text="שנה כמות צוות", bd=3, font=("", 15), padx=1, pady=1, command=change_c, ).grid(row=4,
-                                                                                                             column=1)
-        Entry(self.tef, textvariable=self.status, bd=5, font=("", 15)).grid(row=5, column=0)
-        Button(self.tef, text="שנה סטאטוס:", bd=3, font=("", 15), padx=1, pady=1, command=change_s, ).grid(row=5,
-                                                                                                           column=1)
+        Button(self.dtef, text="חזור", bd=3, font=("", 15), padx=1, pady=1, command=back, ).grid(row=6, column=0)
 
-        Button(self.tef, text="חזור", bd=3, font=("", 15), padx=1, pady=1, command=back, ).grid(row=6, column=0)
-
-        self.tef.pack()
+        self.dtef.pack()
 
     def task_editor_frame(self):
         t = TASK.get_task(self.taskId.get(), self.prjNum.get())
@@ -1710,7 +2174,7 @@ class main:
             return
 
         def back():
-            self.tef.forget()
+            self.dtef.forget()
             self.task_frame()
 
         def message_crew():
@@ -1726,70 +2190,110 @@ class main:
 
         def change_h():
             TASK.update_hour(self.prjNum.get(), self.taskId.get(), self.time.get())
-            Label(self.tef, text=self.time.get(), font=("", 20), pady=10, padx=10).grid(
+            Label(self.dtef, text=self.time.get(), font=("", 20), pady=10, padx=10).grid(
                 row=1, column=0
             )
             message_crew()
 
         def change_c():
             TASK.update_crew(self.prjNum.get(), self.taskId.get(), self.crew.get())
-            Label(self.tef, text=self.crew.get(), font=("", 20), pady=10, padx=10).grid(
+            Label(self.dtef, text=self.crew.get(), font=("", 20), pady=10, padx=10).grid(
                 row=2, column=0
             )
             message_crew()
 
         def change_s():
             TASK.update_status(self.prjNum.get(), self.taskId.get(), self.status.get())
-            Label(self.tef, text=self.status.get(), font=("", 20), pady=10, padx=10).grid(
-                row=2, column=0
+            Label(self.dtef, text=self.status.get(), font=("", 20), pady=10, padx=10).grid(
+                row=3, column=0
             )
             message_crew()
 
-        self.status.set(t[4])
+
+        def change_d():
+            TASK.update_description(self.prjNum.get(), self.taskId.get(), self.description.get())
+            Label(self.dtef, text=self.description.get(), font=("", 20), pady=10, padx=10).grid(
+                row=5, column=0
+            )
+            message_crew()
+
+
+
+
         self.time.set(t[2])
         self.crew.set(t[3])
+        self.status.set(t[4])
+        self.priorty.set(t[5])
+        self.description.set(t[6])
         self.shtf.forget()
 
-        Label(self.tef, text=":מזהה משימה ", font=("", 20), pady=10, padx=10).grid(
+
+        Label(self.dtef, text=":מזהה משימה ", font=("", 20), pady=10, padx=10).grid(
             row=0, column=1
         )
-        Label(self.tef, text=self.taskId.get(), font=("", 20), pady=10, padx=10).grid(
+        Label(self.dtef, text=self.taskId.get(), font=("", 20), pady=10, padx=10).grid(
             row=0, column=0
         )
-        Label(self.tef, text=":מספר שעות מוערך להשלמת משימה ", font=("", 20), pady=10, padx=10).grid(
+        Label(self.dtef, text=":מספר שעות מוערך להשלמת משימה ", font=("", 20), pady=10, padx=10).grid(
             row=1, column=1
         )
-        Label(self.tef, text=self.time.get(), font=("", 20), pady=10, padx=10).grid(
+        Label(self.dtef, text=self.time.get(), font=("", 20), pady=10, padx=10).grid(
             row=1, column=0
         )
-        Label(self.tef, text=":כמות אנשי צוות דרוש ", font=("", 20), pady=10, padx=10).grid(
+        Label(self.dtef, text=":כמות אנשי צוות דרוש ", font=("", 20), pady=10, padx=10).grid(
             row=2, column=1
         )
-        Label(self.tef, text=self.crew.get(), font=("", 20), pady=10, padx=10).grid(
+        Label(self.dtef, text=self.crew.get(), font=("", 20), pady=10, padx=10).grid(
             row=2, column=0
         )
-        Label(self.tef, text="סטאטוס חדש", font=("", 20), pady=10, padx=10).grid(
+        Label(self.dtef, text=" :סטאטוס", font=("", 20), pady=10, padx=10).grid(
             row=3, column=1
         )
-        Label(self.tef, text=self.status.get(), font=("", 20), pady=10, padx=10).grid(
+        Label(self.dtef, text=self.status.get(), font=("", 20), pady=10, padx=10).grid(
             row=3, column=0
         )
+        Label(self.dtef, text=" :סטאטוס", font=("", 20), pady=10, padx=10).grid(
+            row=3, column=1
+        )
+        Label(self.dtef, text=self.status.get(), font=("", 20), pady=10, padx=10).grid(
+            row=3, column=0
+        )
+        Label(self.dtef, text=" :עדיפות", font=("", 20), pady=10, padx=10).grid(
+            row=4, column=1
+        )
+        Label(self.dtef, text=self.priorty.get(), font=("", 20), pady=10, padx=10).grid(
+            row=4, column=0
+        )
 
-        Entry(self.tef, textvariable=self.time, bd=5, font=("", 15)).grid(row=3, column=0)
-        Button(self.tef, text="שנה מספר שעות ", bd=3, font=("", 15), padx=1, pady=1, command=change_h, ).grid(row=3,
+        Label(self.dtef, text=" :תיאור", font=("", 20), pady=10, padx=10).grid(
+            row=5, column=1
+        )
+        Label(self.dtef, text=self.description.get(), font=("", 20), pady=10, padx=10).grid(
+            row=5, column=0
+        )
+
+
+
+
+        Entry(self.dtef, textvariable=self.time, bd=5, font=("", 15)).grid(row=7, column=0)
+        Button(self.dtef, text="שנה מספר שעות ", bd=3, font=("", 15), padx=1, pady=1, command=change_h, ).grid(row=7,
+                                                                                                               column=1)
+
+        Entry(self.dtef, textvariable=self.crew, bd=5, font=("", 15)).grid(row=8, column=0)
+        Button(self.dtef, text="שנה כמות צוות", bd=3, font=("", 15), padx=1, pady=1, command=change_c, ).grid(row=8,
                                                                                                               column=1)
 
-        Entry(self.tef, textvariable=self.crew, bd=5, font=("", 15)).grid(row=4, column=0)
-        Button(self.tef, text="שנה כמות צוות", bd=3, font=("", 15), padx=1, pady=1, command=change_c, ).grid(row=4,
-                                                                                                             column=1)
+        Entry(self.dtef, textvariable=self.crew, bd=5, font=("", 15)).grid(row=9, column=0)
+        Button(self.dtef, text="שנה סטאטוס", bd=3, font=("", 15), padx=1, pady=1, command=change_s, ).grid(row=9,
+                                                                                                           column=1)
 
-        Entry(self.tef, textvariable=self.crew, bd=5, font=("", 15)).grid(row=4, column=0)
-        Button(self.tef, text="שנה סטאטוס", bd=3, font=("", 15), padx=1, pady=1, command=change_s, ).grid(row=4,
+        Entry(self.dtef, textvariable=self.description, bd=5, font=("", 15)).grid(row=10, column=0)
+        Button(self.dtef, text="שנה תיאור", bd=3, font=("", 15), padx=1, pady=1, command=change_d, ).grid(row=10,
                                                                                                           column=1)
 
-        Button(self.tef, text="חזור", bd=3, font=("", 15), padx=1, pady=1, command=back, ).grid(row=5, column=0)
+        Button(self.dtef, text="חזור", bd=3, font=("", 15), padx=1, pady=1, command=back, ).grid(row=11, column=0)
 
-        self.tef.pack()
+        self.dtef.pack()
 
     def show_task_frame(self):
         def back():
@@ -1840,26 +2344,22 @@ class main:
         Button(self.tf, text="מחק משימה", bd=3, font=("", 15), padx=1, pady=1, command=self.remove_task_frame, ).grid(
             row=4, column=1)
 
-        Label(self.tf, text="******************", font=("", 20), pady=10, padx=10).grid(row=7, column=0)
-        Label(self.tf, text="******************", font=("", 20), pady=10, padx=10).grid(row=7, column=1)
-        Label(self.tf, text="******************", font=("", 20), pady=10, padx=10).grid(row=7, column=2)
-        Label(self.tf, text="משימות קיימות בפרויקט", font=("", 20), pady=10, padx=10).grid(row=8, column=1)
+        Label(self.tf, text="משימות הקיימות בפרויקט", font=("", 20), pady=10, padx=10).grid(row=8, column=1)
 
         Label(self.tf, text="מזהה משימה", font=("", 20, 'underline'), pady=10, padx=10).grid(row=9, column=2)
-        Label(self.tf, text="מספר שעות מוערך", font=("", 20, 'underline'), pady=10, padx=10).grid(row=9, column=1)
-        Label(self.tf, text="מספר צוות דרוש", font=("", 20, 'underline'), pady=10, padx=10).grid(row=9, column=0)
+        Label(self.tf, text="תאור", font=("", 20, 'underline'), pady=10, padx=10).grid(row=9, column=1)
+
         i = 10
         for t in tasks:
             Label(self.tf, text="   " + t[1] + "   ", font=("", 20), pady=10, padx=10).grid(row=i, column=2)
-            Label(self.tf, text="   " + t[2] + "   ", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
-            Label(self.tf, text="   " + t[3] + "   ", font=("", 20), pady=10, padx=10).grid(row=i, column=0)
+            Label(self.tf, text="   " + t[6] + "   ", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
             i = i + 1
 
         Label(self.tf, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=2)
         Label(self.tf, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
-        Label(self.tf, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=0)
+
         i = i + 1
-        Label(self.tf, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=2)
+
         Label(self.tf, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
         Label(self.tf, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=0)
 
