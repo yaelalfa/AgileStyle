@@ -3,7 +3,7 @@ from tkinter import *
 from tkinter import messagebox as ms
 import tkinter as tk
 import sqlite3
-
+import mysql.connector
 #import matplotlib
 #import plotly.express as px
 #import pandas as pd
@@ -33,19 +33,20 @@ import datetime as dt
 #from matplotlib.figure import Figure
 # pandas import DataFrame
 
-users = sqlite3.connect("users.db")
+users = mysql.connector.connect(
+    host="b0cqj1javyo2et169rya-mysql.services.clever-cloud.com",
+    user="usqjg0g0nbwvdfdf",
+    passwd="88KJ85sZX1CKqSFyzJ09",
+    database="b0cqj1javyo2et169rya"
+)
 
 # users.cursor().execute("drop table users")
 
 users.cursor().execute(
-    "CREATE TABLE IF NOT EXISTS users (username TEXT PRIMARY KEY ,password TEXT, role TEXT)"
+    "CREATE TABLE IF NOT EXISTS users (username VARCHAR(255) PRIMARY KEY ,password VARCHAR(255), role VARCHAR(255))"
 )
 
-print(
-    users.cursor()
-        .execute("SELECT username, role FROM users")
-        .fetchall()
-)
+#print(users.cursor().execute("SELECT username,role FROM users").fetchall())
 
 Maneger = "manager"
 Developer = "developer"
@@ -55,17 +56,17 @@ imgs = {}
 
 ##########################################################################################
 # creat database if not exist and get conecction to it
-conect = sqlite3.connect('myDb.db')
+conect =users
 
 # get a cursor to execute sql statements
-cc = conect.cursor()
+cc = conect.cursor(buffered=True)
 #sql= '''DROP TABLE project_tasks'''
 #cc.execute(sql)
 # creat table
 sql = '''CREATE TABLE IF NOT EXISTS projects
-    (projId text PRIMARY KEY,
-        name text,
-        managerId text )'''
+    (projId VARCHAR(255) PRIMARY KEY,
+        name VARCHAR(255),
+        managerId VARCHAR(255) )'''
 cc.execute(sql)
 
 #sql = '''DROP TABLE project_tasks
@@ -73,34 +74,33 @@ cc.execute(sql)
 #cc.execute(sql)
 
 sql = '''CREATE TABLE IF NOT EXISTS project_tasks
-         (projId text NOT NULL,
-          taskId text NOT NULL,
-          time text,
-          crew text ,
-          status text,
-          priorty text,
+         (projId VARCHAR(255) NOT NULL,
+          taskId VARCHAR(255) NOT NULL,
+          time VARCHAR(255),
+          crew VARCHAR(255) ,
+          status VARCHAR(255),
+          priorty VARCHAR(255),
           PRIMARY KEY (projId,taskId))
           '''
 cc.execute(sql)
 
 sql = '''CREATE TABLE IF NOT EXISTS project_crew
-         (projId text NOT NULL,
-          user text NOT NULL,
+         (projId VARCHAR(255) NOT NULL,
+          user VARCHAR(255) NOT NULL,
           PRIMARY KEY (projId,user))
           '''
 cc.execute(sql)
 
 sql = '''CREATE TABLE IF NOT EXISTS user_message
          (
-          sender text NOT NULL,
-          to_user text NOT NULL,
-          message text )
+          sender VARCHAR(255) NOT NULL,
+          to_user VARCHAR(255) NOT NULL,
+          message VARCHAR(255) )
 
           '''
 cc.execute(sql)
 
 conect.commit()
-conect.close()
 
 
 ###########################################################################################
@@ -114,9 +114,9 @@ class PROJECT:
         self.user = us  # usrename
 
     def insert_to_table(self):
-        connect = sqlite3.connect('myDb.db')
-        cc = connect.cursor()
-        sql = '''INSERT INTO projects VALUES(?,?,?)
+        connect = users
+        cc = connect.cursor(buffered=True)
+        sql = '''INSERT INTO projects VALUES(%s,%s,%s)
         '''
         dats_tuple = (self.projId, self.name, self.user)
         try:
@@ -125,14 +125,13 @@ class PROJECT:
         except Exception:
             ms.showerror("שגיאה!", " נסיון להכניס פרויקט חדש לטבלה נכשל")
         connect.commit()
-        connect.close()
 
     @classmethod
     def printAll(cls):
 
         print("projects: ")
-        connect = sqlite3.connect('myDb.db')
-        cc = connect.cursor()
+        connect = users
+        cc = connect.cursor(buffered=True)
 
         sql = 'SELECT * FROM projects'
         cc.execute(sql)
@@ -141,19 +140,18 @@ class PROJECT:
         for row in rows:
             print(row)
         connect.commit()
-        connect.close()
 
     @classmethod
     def projectManager(cls, id):
 
         print("select project manager by project id: " + id)
 
-        connect = sqlite3.connect('myDb.db')
-        cc = connect.cursor()
+        connect = users
+        cc = connect.cursor(buffered=True)
 
         sql = """SELECT managerId 
             FROM projects 
-            where projId=?         
+            where projId=%s         
 
                             """
         dt = (id,)
@@ -168,14 +166,14 @@ class PROJECT:
         return ru
 
         connect.commit()
-        connect.close()
+       
 
     @classmethod
     def remove_by_id(cls, id):
-        connect = sqlite3.connect('myDb.db')
-        cc = connect.cursor()
+        connect = users
+        cc = connect.cursor(buffered=True)
         sql = """DELETE FROM projects 
-                           WHERE projId=? 
+                           WHERE projId=%s 
 
 
                            """
@@ -187,14 +185,14 @@ class PROJECT:
         except Exception:
             ms.showerror("שגיאה", "שגיאה בזמן מחיקת פרויקט")
         connect.commit()
-        connect.close()
+    
 
     @classmethod
     def get_projects(cls, manger_id):
-        connect = sqlite3.connect('myDb.db')
-        cc = connect.cursor()
+        connect = users
+        cc = connect.cursor(buffered=True)
         sql = """SELECT * FROM projects 
-                               WHERE  managerId=? 
+                               WHERE  managerId=%s 
 
 
                                """
@@ -209,15 +207,15 @@ class PROJECT:
         except Exception:
             ms.showerror("שגיאה", "שגיאה בזמן משיכת פרויקטים")
         connect.commit()
-        connect.close()
+        
 
     @classmethod
     def get_project(cls, manger_id, proj_id):
-        connect = sqlite3.connect('myDb.db')
-        cc = connect.cursor()
+        connect = users
+        cc = connect.cursor(buffered=True)
         sql = """SELECT * FROM projects 
-                               WHERE  managerId=? 
-                               AND projId=?
+                               WHERE  managerId=%s 
+                               AND projId=%s
 
 
                                """
@@ -234,15 +232,15 @@ class PROJECT:
         except Exception:
             ms.showerror("שגיאה", "שגיאה בזמן משיכת פרויקט")
         connect.commit()
-        connect.close()
+        
 
     @classmethod
     def get_project_c(cls, name, proj_id):
-        connect = sqlite3.connect('myDb.db')
-        cc = connect.cursor()
+        connect = users
+        cc = connect.cursor(buffered=True)
         sql = """SELECT * FROM projects 
-                               WHERE  name=? 
-                               AND projId=?
+                               WHERE  name=%s
+                               AND projId=%s
 
 
                                """
@@ -259,7 +257,7 @@ class PROJECT:
         except Exception:
             ms.showerror("שגיאה", "שגיאה בזמן משיכת פרויקט")
         connect.commit()
-        connect.close()
+        
 # *************end of project class**********************************#
 
 # **************task class*********************************#
@@ -273,9 +271,9 @@ class TASK:
         self.priorty=priorty
 
     def insert_to_table(self):
-        conect = sqlite3.connect('myDb.db')
-        cc = conect.cursor()
-        sql = '''INSERT INTO project_tasks VALUES(?,?,?,?,?,?)
+        conect =users
+        cc = conect.cursor(buffered=True)
+        sql = '''INSERT INTO project_tasks VALUES(%s,%s,%s,%s,%s,%s)
          '''
         dats_tuple = (self.projId, self.taskId, self.time, self.crewNum, self.status,self.priorty)
 
@@ -287,12 +285,12 @@ class TASK:
             ms.showerror("שגיאה! נסיון להכניס משימה חדשה לטבלה נכשל")
 
         conect.commit()
-        conect.close()
+        
 
     @classmethod
     def printAll(cls):
-        connect = sqlite3.connect('myDb.db')
-        cc = connect.cursor()
+        connect = users
+        cc = connect.cursor(buffered=True)
 
         sql = 'SELECT * FROM project_tasks'
         try:
@@ -305,17 +303,17 @@ class TASK:
             ms.showerror("שגיאה! נסיון למשוך משימות נכשל")
 
         connect.commit()
-        connect.close()
+    
 
     @classmethod
     def get_task(cls, tid, pid):
-        connect = sqlite3.connect('myDb.db')
-        cc = connect.cursor()
+        connect = users
+        cc = connect.cursor(buffered=True)
 
         sql = """SELECT * 
                     FROM project_tasks
-                    where taskId=?   
-                    AND projId=?      
+                    where taskId=%s  
+                    AND projId=%s      
 
                                     """
         dt = (tid, pid)
@@ -332,12 +330,12 @@ class TASK:
 
     @classmethod
     def get_tasks(cls, pid):
-        connect = sqlite3.connect('myDb.db')
-        cc = connect.cursor()
+        connect =users
+        cc = connect.cursor(buffered=True)
 
         sql = """SELECT * 
                         FROM project_tasks
-                        where  projId=?      
+                        where  projId=%s      
 
                                         """
         dt = (pid,)
@@ -354,13 +352,13 @@ class TASK:
 
     @classmethod
     def update_hour(cls, pid, tid, time):
-        connect = sqlite3.connect('myDb.db')
-        cc = connect.cursor()
+        connect = users
+        cc = connect.cursor(buffered=True)
 
         sql = """UPDATE project_tasks
-                        SET time=?
-                        where  projId=?  
-                        AND taskId=?    
+                        SET time=%s
+                        where  projId=%s  
+                        AND taskId=%s    
 
                                         """
         dt = (time, pid, tid)
@@ -376,13 +374,13 @@ class TASK:
 
     @classmethod
     def update_crew(cls, pid, tid, crew):
-        connect = sqlite3.connect('myDb.db')
-        cc = connect.cursor()
+        connect =users
+        cc = connect.cursor(buffered=True)
 
         sql = """UPDATE project_tasks
-                        SET time=?
-                        where  projId=?  
-                        AND taskId=?    
+                        SET time=%s
+                        where  projId=%s  
+                        AND taskId=%s    
 
                                         """
         dt = (crew, pid, tid)
@@ -398,13 +396,13 @@ class TASK:
 
     @classmethod
     def update_status(cls, pid, tid, status):
-        connect = sqlite3.connect('myDb.db')
-        cc = connect.cursor()
+        connect = users
+        cc = connect.cursor(buffered=True)
 
         sql = """UPDATE project_tasks
-                        SET status=?
-                        where  projId=?  
-                        AND taskId=?    
+                        SET status=%s
+                        where  projId=%s  
+                        AND taskId=%s
 
                                         """
         dt = (status, pid, tid)
@@ -420,12 +418,12 @@ class TASK:
 
     @classmethod
     def delet_task(cls, pid, tid):
-        connect = sqlite3.connect('myDb.db')
-        cc = connect.cursor()
+        connect = users
+        cc = connect.cursor(buffered=True)
 
         sql = """DELETE FROM project_tasks
-                        where  projId=?  
-                        AND taskId=?    
+                        where  projId=%s  
+                        AND taskId=%s
 
                                         """
         dt = (pid, tid)
@@ -447,9 +445,9 @@ class TASK:
 class PROJECT_CREW:
     @classmethod
     def insert_to_table(cls, pid, us):
-        conect = sqlite3.connect('myDb.db')
-        cc = conect.cursor()
-        sql = '''INSERT INTO project_crew VALUES(?,?)
+        conect =users
+        cc = conect.cursor(buffered=True)
+        sql = '''INSERT INTO project_crew VALUES(%s,%s)
          '''
         dats_tuple = (pid, us)
 
@@ -461,14 +459,14 @@ class PROJECT_CREW:
             ms.showerror("שגיאה! נסיון להכניס עובד חדש לטבלה נכשל")
 
         conect.commit()
-        conect.close()
+    
 
     @classmethod
     def get_crew(cls, pid):
-        conect = sqlite3.connect('myDb.db')
-        cc = conect.cursor()
+        conect = users
+        cc = conect.cursor(buffered=True)
         sql = '''SELECT * FROM project_crew 
-                 WHERE projId=?
+                 WHERE projId=%s
              '''
         dats_tuple = (pid,)
 
@@ -481,13 +479,12 @@ class PROJECT_CREW:
             ms.showerror("שגיאה", "נסיון למשוך צוות עובדים נכשל")
 
         conect.commit()
-        conect.close()
 
     @classmethod
     def get_project(cls, username):
-        connect = sqlite3.connect('myDb.db')
-        cc = connect.cursor()
-        sql = 'SELECT projId FROM project_crew WHERE  user=?'
+        connect = users
+        cc = connect.cursor(buffered=True)
+        sql = 'SELECT projId FROM project_crew WHERE  user=%s'
         cc.execute(sql, (username,))
         row = cc.fetchone()
         print(row)
@@ -500,9 +497,9 @@ class PROJECT_CREW:
 class MESSAGE:
     @classmethod
     def new_message(cls, sender, to, message):
-        conect = sqlite3.connect('myDb.db')
-        cc = conect.cursor()
-        sql = '''INSERT INTO user_message VALUES(?,?,?)
+        conect = users
+        cc = conect.cursor(buffered=True)
+        sql = '''INSERT INTO user_message VALUES(%s,%s,%s)
                 '''
         dats_tuple = (sender, to, message)
 
@@ -514,12 +511,12 @@ class MESSAGE:
             ms.showerror("שגיאה", "נסיון לשלוח הודעה נכשל נכשל")
 
         conect.commit()
-        conect.close()
+        
 
     @classmethod
     def printAll(cls):
-        connect = sqlite3.connect('myDb.db')
-        cc = connect.cursor()
+        connect = users
+        cc = connect.cursor(buffered=True)
 
         sql = 'SELECT * FROM user_message'
         try:
@@ -532,14 +529,16 @@ class MESSAGE:
             ms.showerror("שגיאה", "שגיאה! נסיון למשוך הודעות נכשל")
 
         connect.commit()
-        connect.close()
+        
 
     @classmethod
     def get_my_mesagges(cls, us):
-        connect = sqlite3.connect('myDb.db')
-        cc = connect.cursor()
+        connect = users
+        print(connect)
+        print("***")
+        cc = connect.cursor(buffered=True)
 
-        sql = 'SELECT * FROM user_message where to_user=? '
+        sql = 'SELECT * FROM user_message where to_user=%s '
         tp = (us,)
         try:
 
@@ -550,7 +549,6 @@ class MESSAGE:
             ms.showerror("שגיאה", "שגיאה! נסיון למשוך הודעות נכשל")
 
         connect.commit()
-        connect.close()
 
 
 # ************end of message  class**********************************#
@@ -586,9 +584,9 @@ class main:
     def login(self):
         # Establish Connection
         # with sqlite3.connect('quit.db') as db:
-        c = self.users_db.cursor()
+        c = self.users_db.cursor(buffered=True)
         # Find user If there is any take proper action
-        find_user = "SELECT * FROM users WHERE username = ? and password = ?"
+        find_user = "SELECT * FROM users WHERE username = %s and password = %s"
         c.execute(find_user, [(self.username.get()), (self.password.get())])
         result = c.fetchone()
         if not result:
@@ -601,7 +599,7 @@ class main:
         role = result[2].lower()
         if role == Maneger:
             c.execute(
-                "SELECT username FROM users WHERE username=?", (self.username.get(),)
+                "SELECT username FROM users WHERE username=%s", (self.username.get(),)
             )
             self.maneger_frame()
         elif role == Developer:
@@ -610,7 +608,7 @@ class main:
             pass
         elif role == Custumer:
             c.execute(
-                "SELECT username FROM users WHERE username=?", (self.username.get(),)
+                "SELECT username FROM users WHERE username=%s", (self.username.get(),)
             )
             self.custumer_frame()
         else:
@@ -618,21 +616,21 @@ class main:
             return
 
     def forgot_password(self):
-        c = self.users_db.cursor()
-        find_user = "SELECT * FROM users WHERE username = ? "
+        c = self.users_db.cursor(buffered=True)
+        find_user = "SELECT * FROM users WHERE username = %s "
         c.execute(find_user, [(self.findName.get())])
         result = c.fetchone()
         if not result:
             ms.showerror("אוי", "שם המשתמש לא קיים")
             return
-        update = """UPDATE users set password = ? where username = ?"""
+        update = """UPDATE users set password = %s where username = %s"""
         c.execute(update, [self.resetPass.get(), self.findName.get()])
         self.users_db.commit()
         self.login_frame()
 
     def new_user(self):
         # Establish Connection
-        users_cursor = self.users_db.cursor()
+        users_cursor = self.users_db.cursor(buffered=True)
 
         # Find Existing username if any take proper action
         # find_user = "SELECT * FROM users WHERE username = ?"
@@ -649,7 +647,7 @@ class main:
             return
 
         # Create New Account
-        insert_users = "INSERT INTO users(username, password, role) VALUES(?,?,?)"
+        insert_users = "INSERT INTO users(username, password, role) VALUES(%s,%s,%s)"
 
         try:
             users_cursor.execute(
@@ -1316,8 +1314,8 @@ class main:
             Label(self.cf, text="            ", font=("", 20), pady=10, padx=10).grid(row=j, column=1)
 
         def add_crew_member():
-            c = self.users_db.cursor()
-            sql = "SELECT * FROM users WHERE role = 'developer' AND username=? "
+            c = self.users_db.cursor(buffered=True)
+            sql = "SELECT * FROM users WHERE role = 'developer' AND username=%s "
             tp = (self.user_crew.get(),)
             try:
                 c.execute(sql, tp)
@@ -1336,7 +1334,7 @@ class main:
             MESSAGE.printAll()
             my_crew()
 
-        c = self.users_db.cursor()
+        c = self.users_db.cursor(buffered=True)
         # Find user If there is any take proper action
         sql = "SELECT * FROM users WHERE role = 'developer' "
         try:
