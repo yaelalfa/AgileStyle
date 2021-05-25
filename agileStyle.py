@@ -111,6 +111,15 @@ sql = '''CREATE TABLE IF NOT EXISTS Remarks
           remark VARCHAR(255)  NOT NULL
         )
           '''
+
+
+###טבלה לשיוך לקוחות לפרויקטיחם#
+sql = '''CREATE TABLE IF NOT EXISTS proj_cust 
+         (
+          projId VARCHAR(255) NOT NULL,
+          user VARCHAR(255) NOT NULL
+        )
+          '''
 cc.execute(sql)
 
 conect.commit()
@@ -653,7 +662,7 @@ class REMARK:
     def get_task_remarks(cls, projId, taskId):
         connect = users
         print(connect)
-        print("***")
+
         cc = connect.cursor(buffered=True)
 
         sql = 'SELECT * FROM Remarks where projId=%s AND taskId=%s '
@@ -687,7 +696,41 @@ class REMARK:
 
         connect.commit()
 
+class PROJECT_customer:
+    @classmethod
+    def add_cust(cls, projId, user):
+        conect = users
+        cc = conect.cursor(buffered=True)
+        sql = '''INSERT INTO proj_cust VALUES(%s,%s)
+                                   '''
+        dats_tuple = (projId,  user)
 
+        try:
+            cc.execute(sql, dats_tuple)
+            ms.showinfo("", "לקוח שוייך לפרויקט")
+
+        except Exception:
+            ms.showerror("שגיאה", "נסיון לשייך לקוח נכשל")
+
+        conect.commit()
+
+    @classmethod
+    def get_proj(cls, user):
+        conect = users
+        cc = conect.cursor(buffered=True)
+        tp= (user,)
+
+        sql = 'SELECT * FROM proj_cust where user=%s  '
+
+        try:
+
+            cc.execute(sql, tp)
+            rows = cc.fetchall()
+            return rows
+        except Exception:
+            ms.showerror("שגיאה", "שגיאה! נסיון למשוך פרויקטים נכשל")
+
+        conect.commit()
 
 
 
@@ -724,6 +767,7 @@ class main:
         self.description=StringVar()
         self.title=StringVar()
         self.remark=StringVar()
+        self.cust_username=StringVar()
 
     # Login Function
     def login(self):
@@ -1240,6 +1284,8 @@ class main:
         self.dshtf = Frame(self.master, padx=20, pady=30)  # developer show task frame
 
         self.drf= Frame(self.master, padx=20, pady=30)  # developer remark  frame
+
+        self.pcf = Frame(self.master, padx=20, pady=30)  # project customer frame
 
 ###############developer funcs########################
     def d_project_frame(self):
@@ -1888,12 +1934,44 @@ class main:
         Button(self.pef, text="משימות", bd=3, font=("", 15), padx=1, pady=1, command=self.task_frame, ).grid(row=3,
                                                                                                              column=1)
         self.prjName.set(proj[1])
-        Button(self.pef, text="צוות", bd=3, font=("", 15), padx=1, pady=1, command=self.crew_frame, ).grid(row=4,
-                                                                                                           column=1)
+        Button(self.pef, text="צוות", bd=3, font=("", 15), padx=1, pady=1, command=self.crew_frame, ).grid(row=4,column=1)
 
-        Button(self.pef, text="חזור", bd=3, font=("", 15), padx=1, pady=1, command=back, ).grid(row=5, column=1)
+
+        Button(self.pef, text="שייך לקוחות לפרויקט", bd=3, font=("", 15), padx=1, pady=1, command=self.proj_cust_frame, ).grid(row=5,column=1)
+
+
+        Button(self.pef, text="חזור", bd=3, font=("", 15), padx=1, pady=1, command=back, ).grid(row=6, column=1)
 
         self.pef.pack()
+
+
+    def proj_cust_frame(self):
+        self.pef.forget()
+        self.head["text"] = "שיוןך לקוח לפרויקט"
+
+        def back():
+            self.pcf.forget()
+            self.proj_editor_frame()
+
+
+        def add():
+            PROJECT_customer.add_cust(self.prjNum.get(),self.cust_username.get())
+
+
+        Label(self.pcf, text=":שם משתמש של לקוח ", font=("", 20), pady=10, padx=10).grid(row=0, column=0)
+
+
+        Entry(self.pcf, textvariable=self.cust_username, bd=5, font=("", 15)).grid(row=0, column=1)
+
+
+
+        Button(self.pcf, text="הוסף", bd=3, font=("", 15), padx=1, pady=1, command=add, ).grid(row=2, column=0)
+        Button(self.pcf, text="חזור", bd=3, font=("", 15), padx=1, pady=1, command=back, ).grid(row=3, column=0)
+
+        self.pcf.pack()
+
+
+
 
     def proj_editor_frame_c(self):
         proj = PROJECT.get_project_c(self.prjName.get(), self.prjNum.get())
