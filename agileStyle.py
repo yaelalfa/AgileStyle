@@ -779,14 +779,7 @@ class main:
         ).grid(row=0, column=0)
 
 
-        Button(self.df,
-               text=" סכימה ",
-               bd=3,
-               font=("", 15),
-               padx=5,
-               pady=5,
-               command=self.schema_dev,
-               ).grid(row=4, column=1)
+
         Button(self.df,
                text=" להתנתק ",
                bd=3,
@@ -1281,13 +1274,23 @@ class main:
         Label(self.dpef, text=proj[2], font=("", 20), pady=10, padx=10).grid(row=3, column=0)
 
 
-        Button(self.dpef, text="משימות", bd=3, font=("", 15), padx=1, pady=1, command=self.dev_task_frame, ).grid(row=4,
+        Button(self.dpef,
+               text=" סכימה ",
+               bd=3,
+               font=("", 15),
+               padx=5,
+               pady=5,
+               command=self.schema_dev,
+               ).grid(row=4, column=1)
+
+
+        Button(self.dpef, text="משימות", bd=3, font=("", 15), padx=1, pady=1, command=self.dev_task_frame, ).grid(row=5,
                                                                                                              column=1)
         self.prjName.set(proj[1])
         self.prjNum.set(proj[0])
 
 
-        Button(self.dpef, text="חזור", bd=3, font=("", 15), padx=1, pady=1, command=back, ).grid(row=5, column=1)
+        Button(self.dpef, text="חזור", bd=3, font=("", 15), padx=1, pady=1, command=back, ).grid(row=6, column=1)
 
         self.dpef.pack()
 
@@ -1313,6 +1316,7 @@ class main:
             row=3, column=1)
         Button(self.dtf, text="מחק משימה", bd=3, font=("", 15), padx=1, pady=1, command=self.dev_remove_task_frame, ).grid(
             row=4, column=1)
+
 
         Label(self.dtf, text="******************", font=("", 20), pady=10, padx=10).grid(row=7, column=0)
         Label(self.dtf, text="******************", font=("", 20), pady=10, padx=10).grid(row=7, column=1)
