@@ -101,6 +101,18 @@ sql = '''CREATE TABLE IF NOT EXISTS user_message
           '''
 cc.execute(sql)
 
+###הערות על משימות#
+sql = '''CREATE TABLE IF NOT EXISTS Remarks 
+         (
+          projId VARCHAR(255) NOT NULL,
+          taskId VARCHAR(255) NOT NULL,
+          title VARCHAR(255) NOT NULL,
+          user VARCHAR(255) NOT NULL,
+          remark VARCHAR(255)  NOT NULL
+        )
+          '''
+cc.execute(sql)
+
 conect.commit()
 
 
@@ -618,6 +630,71 @@ class MESSAGE:
 
 # ************end of message  class**********************************#
 
+# ************Remark class**********************************#
+class REMARK:
+    @classmethod
+    def new_remark(cls, projId, taskId, title, user, remark):
+        conect = users
+        cc = conect.cursor(buffered=True)
+        sql = '''INSERT INTO Remarks VALUES(%s,%s,%s,%s,%s)
+                                   '''
+        dats_tuple = (projId, taskId, title, user, remark)
+
+        try:
+            cc.execute(sql, dats_tuple)
+            ms.showinfo("", "נוספה הערה חדשה")
+
+        except Exception:
+            ms.showerror("שגיאה", "נסיון להוסיף הערה נכשל")
+
+        conect.commit()
+
+    @classmethod
+    def get_task_remarks(cls, projId, taskId):
+        connect = users
+        print(connect)
+        print("***")
+        cc = connect.cursor(buffered=True)
+
+        sql = 'SELECT * FROM Remarks where projId=%s AND taskId=%s '
+        tp = (projId, taskId)
+        try:
+
+            cc.execute(sql, tp)
+            rows = cc.fetchall()
+            return rows
+        except Exception:
+            ms.showerror("שגיאה", "שגיאה! נסיון למשוך הערות נכשל")
+
+        connect.commit()
+
+    @classmethod
+    def remove_remark(cls, projId, taskId, title):
+        connect = users
+        print(connect)
+        print("***")
+        cc = connect.cursor(buffered=True)
+
+        sql = 'SELECT * FROM Remarks where projId=%s AND taskId=%s AND title=%s '
+        tp = (projId, taskId, title)
+        try:
+
+            cc.execute(sql, tp)
+            rows = cc.fetchall()
+            return rows
+        except Exception:
+            ms.showerror("שגיאה", "שגיאה! נסיון למשוך הערות נכשל")
+
+        connect.commit()
+
+
+
+
+
+
+# ************end of remark class**********************************#
+
+
 # main Class
 class main:
     def __init__(self, master):
@@ -645,6 +722,8 @@ class main:
         self.user_crew = StringVar()
         self.status = StringVar()
         self.description=StringVar()
+        self.title=StringVar()
+        self.remark=StringVar()
 
     # Login Function
     def login(self):
@@ -1160,6 +1239,8 @@ class main:
         self.dtef = Frame(self.master, padx=20, pady=30)  # developer task editor frame
         self.dshtf = Frame(self.master, padx=20, pady=30)  # developer show task frame
 
+        self.drf= Frame(self.master, padx=20, pady=30)  # developer remark  frame
+
 ###############developer funcs########################
     def d_project_frame(self):
         my_p=PROJECT_CREW.get_developer_projects(self.username.get())
@@ -1499,6 +1580,9 @@ class main:
         self.description.set(t[6])
         self.dshtf.forget()
 
+
+
+
         Label(self.dtef, text=":מזהה משימה ", font=("", 20), pady=10, padx=10).grid(
             row=0, column=1
         )
@@ -1543,6 +1627,9 @@ class main:
             row=5, column=0
         )
 
+        Button(self.dtef, text="הערות", bd=3, font=("", 15), padx=1, pady=1, command=self.dev_remark_frame, ).grid(row=6,
+                                                                                                               column=1)
+
         Entry(self.dtef, textvariable=self.time, bd=5, font=("", 15)).grid(row=7, column=0)
         Button(self.dtef, text="שנה מספר שעות ", bd=3, font=("", 15), padx=1, pady=1, command=change_h, ).grid(row=7,
                                                                                                                column=1)
@@ -1559,9 +1646,83 @@ class main:
         Button(self.dtef, text="שנה תיאור", bd=3, font=("", 15), padx=1, pady=1, command=change_d, ).grid(row=10,
                                                                                                           column=1)
 
+
+
+
         Button(self.dtef, text="חזור", bd=3, font=("", 15), padx=1, pady=1, command=back, ).grid(row=11, column=0)
 
         self.dtef.pack()
+
+
+
+
+
+
+
+    def dev_remark_frame(self):
+        self.dtef.forget()
+        def back():
+            self.drf.forget()
+            self.dev_task_editor_frame()
+
+        def drow_list(i):
+            remarks= REMARK.get_task_remarks(self.prjNum.get(),self.taskId.get())
+            Label(self.drf, text="************* ", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
+            Label(self.drf, text="************* ", font=("", 20), pady=10, padx=10).grid(    row=i, column=0)
+            Label(self.drf, text="************* ", font=("", 20), pady=10, padx=10).grid(row = i, column = 2)
+            i=i+1
+            Label(self.drf, text="הערות קיימות", font=("", 20), pady=10, padx=10).grid(row=i, column=2)
+            i=i+1
+            Label(self.drf, text="כותרת", font=("", 20, 'underline'), pady=10, padx=10).grid(row=i, column=2)
+            Label(self.drf, text="מאת", font=("", 20, 'underline'), pady=10, padx=10).grid(row=i, column=1)
+            Label(self.drf, text="הערה", font=("", 20, 'underline'), pady=10, padx=10).grid(row=i, column=0)
+            i = i+1
+            for r in remarks:
+                Label(self.drf, text="   " + r[2] + "   ", font=("", 20), pady=10, padx=10).grid(row=i, column=2)
+                Label(self.drf, text="   " + r[3] + "   ", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
+                Label(self.drf, text="   " + r[4] + "   ", font=("", 20), pady=10, padx=10).grid(row=i, column=0)
+                i = i + 1
+
+            Label(self.drf, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=2)
+            Label(self.drf, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
+            Label(self.drf, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=0)
+            self.drf.pack()
+
+
+
+
+
+
+
+
+        def add():
+            REMARK.new_remark(self.prjNum.get(),self.taskId.get(),self.title.get(),self.username.get(),self.remark.get())
+            drow_list(7)
+
+        def remove():
+            REMARK.remove_remark(self.prjNum.get(),self.taskId.get(),self.title.get())
+            drow_list(7)
+
+        self.head["text"] =self.taskId.get() + " הערות על משימה "
+        Label(self.drf, text="כותרת", font=("", 20), pady=10, padx=10).grid(row=1, column=1)
+        Entry(self.drf, textvariable=self.title, bd=5, font=("", 15)).grid(row=1, column=0)
+        Label(self.drf, text="הערה", font=("", 20), pady=10, padx=10).grid(row=2, column=1)
+        Entry(self.drf, textvariable=self.remark, bd=5, font=("", 15)).grid(row=2, column=0)
+        Button(self.drf, text="הוסף הערה", bd=3, font=("", 15), padx=1, pady=1, command=add, ).grid(row=3, column=1)
+
+        Button(self.drf, text="מחק הערה (רשום כותרת הערה)", bd=3, font=("", 15), padx=1, pady=1, command=remove, ).grid(row=4, column=1)
+        Entry(self.drf, textvariable=self.title, bd=5, font=("", 15)).grid(
+            row=4, column=0
+        )
+
+        Button(self.drf, text="חזור", bd=3, font=("", 15), padx=1, pady=1, command=back, ).grid(row=5,  column=1)
+
+        drow_list(7)
+        self.drf.pack()
+
+
+
+
 
 ###############end developer funcs########################
 
