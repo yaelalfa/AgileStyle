@@ -952,6 +952,22 @@ class main:
         self.logf.pack_forget()
         self.scc.pack_forget()
         self.head["text"] = "לקוח"
+        projs=PROJECT_customer.get_proj(self.username.get())
+
+
+        for p in projs:
+            print(p[0])
+
+
+        Button(self.cusf,
+               text=" פתח פרויקט",
+               bd=3,
+               font=("", 15),
+               padx=5,
+               pady=5,
+               command=self.cus_show_proj_frame,
+               ).grid(row=1, column=1)
+
         Button(self.cusf,
                text=" סכימה ",
                bd=3,
@@ -959,7 +975,7 @@ class main:
                padx=5,
                pady=5,
                command=self.schema_cus,
-               ).grid(row=4, column=1)
+               ).grid(row=2, column=1)
         Button(self.cusf,
                text=" להתנתק ",
                bd=3,
@@ -967,15 +983,26 @@ class main:
                padx=5,
                pady=5,
                command=self.login_frame,
-               ).grid(row=4, column=0)
-        Button(self.cusf,
-               text=" מצב משימות ",
-               bd=3,
-               font=("", 15),
-               padx=5,
-               pady=5,
-               command=self.show_proj_frame_c,
-               ).grid(row=4, column=2)
+               ).grid(row=3, column=1)
+
+        i = 6
+        Label(self.cusf, text="*******************", font=("", 20), pady=10, padx=10).grid(row=i, column=0)
+        Label(self.cusf, text="*******************", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
+        i=i+1
+        Label(self.cusf, text="הפרויקטים שאתה משויך אליהם", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
+        i=i+1
+        Label(self.cusf, text="שם הפרויקט", font=("", 20, 'underline'), pady=10, padx=10).grid(row=i, column=0)
+        Label(self.cusf, text="מזהה הפרויקט", font=("", 20, 'underline'), pady=10, padx=10).grid(row=i, column=1)
+        i=i+1
+        for p in projs:
+            t=PROJECT.get_project_by_projId(p[0])
+            Label(self.cusf, text="   " + t[1] + "   ", font=("", 20), pady=10, padx=10).grid(row=i, column=0)
+            Label(self.cusf, text="   " + t[0] + "    ", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
+            i = i + 1
+
+
+
+
         self.cusf.pack()
 
     ## tasks for developer page
@@ -1287,6 +1314,326 @@ class main:
 
         self.pcf = Frame(self.master, padx=20, pady=30)  # project customer frame
 
+        self.cspf = Frame(self.master, padx=20, pady=30)  # customer show project frame
+        self.cpef = Frame(self.master, padx=20, pady=30)  # customer project editor frame
+        self.cshtf = Frame(self.master, padx=20, pady=30)  # customer show task frame
+        self.ctf = Frame(self.master, padx=20, pady=30)  #   customer task frame  ( cus_task_fram)
+        self.crf = Frame(self.master, padx=20, pady=30)  # customer remark  frame
+
+
+
+#########customer funcs########################
+
+
+    def cus_show_proj_frame(self):
+
+        self.cusf.forget()
+        def back():
+            self.cspf.forget()
+            self.custumer_frame()
+
+        def chek_proj():
+            projs=PROJECT_customer.get_proj(self.username.get())
+            x=0
+            for p in projs:
+                if p[0] == self.prjNum.get():
+                    x=1
+                    self.cus_proj_editor_frame()
+
+            if x == 0:
+                ms.showerror("שגיאה", "הפרויקט המבוקש לא נמצא")
+
+
+
+
+
+
+        self.head["text"] = "הצגת פרויקט"
+        Label(self.cspf, text="מספר מזהה של פרויקט: ", font=("", 20), pady=10, padx=10).grid(
+            row=0, column=1
+        )
+        Entry(self.cspf, textvariable=self.prjNum, bd=5, font=("", 15)).grid(
+            row=0, column=0
+        )
+        Button(
+            self.cspf,
+            text="הצג",
+            bd=3,
+            font=("", 15),
+            padx=1,
+            pady=1,
+            command=chek_proj, ).grid(row=2, column=1)
+
+        Button(
+            self.cspf,
+            text="חזור",
+            bd=3,
+            font=("", 15),
+            padx=1,
+            pady=1,
+            command=back, ).grid(row=3, column=1)
+
+        self.cspf.pack()
+
+    def cus_proj_editor_frame(self):
+
+
+        proj = PROJECT.get_project_by_projId(self.prjNum.get())
+        if not proj:
+            ms.showerror("שגיאה", "הפרויקט המבוקש לא נמצא")
+            return
+
+
+        self.cspf.forget()
+
+        def back():
+            self.cpef.forget()
+            self.custumer_frame()
+
+        Label(self.cpef, text=":שם הפרויקט ", font=("", 20), pady=10, padx=10).grid(row=1, column=1)
+        Label(self.cpef, text=proj[1], font=("", 20), pady=10, padx=10).grid(row=1, column=0)
+        Label(self.cpef, text=":מזהה הפרויקט ", font=("", 20), pady=10, padx=10).grid(row=2, column=1)
+        Label(self.cpef, text=proj[0], font=("", 20), pady=10, padx=10).grid(row=2, column=0)
+        Label(self.cpef, text=":מנהל הפרויקט ", font=("", 20), pady=10, padx=10).grid(row=3, column=1)
+        Label(self.cpef, text=proj[2], font=("", 20), pady=10, padx=10).grid(row=3, column=0)
+
+
+        self.prjName.set(proj[1])
+        self.prjNum.set(proj[0])
+
+
+
+        Button(self.cpef,
+               text=" מצב משימות ",
+               bd=3,
+               font=("", 15),
+               padx=5,
+               pady=5,
+               command=self.show_proj_frame_c,
+               ).grid(row=4, column=1)
+
+
+
+
+        Button(self.cpef,
+               text=" סכימה ",
+               bd=3,
+               font=("", 15),
+               padx=5,
+               pady=5,
+               command=self.schema_cus,
+               ).grid(row=5, column=1)
+
+        Button(self.cpef,
+               text="פתח משימה ",
+               bd=3,
+               font=("", 15),
+               padx=5,
+               pady=5,
+               command=self.cus_show_task_frame,
+               ).grid(row=5, column=1)
+
+
+
+
+        Button(self.cpef, text="חזור", bd=3, font=("", 15), padx=1, pady=1, command=back, ).grid(row=6, column=1)
+
+        tasks=TASK.get_tasks(self.prjNum.get())
+        i=10
+
+        Label(self.cpef, text="******************", font=("", 20), pady=10, padx=10).grid(row=i, column=0)
+        Label(self.cpef, text="******************", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
+        Label(self.cpef, text="******************", font=("", 20), pady=10, padx=10).grid(row=i, column=2)
+        i=i+1
+        Label(self.cpef, text="משימות הקיימות בפרויקט", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
+        i=i+1
+        Label(self.cpef, text="מזהה משימה", font=("", 20, 'underline'), pady=10, padx=10).grid(row=i, column=2)
+        Label(self.cpef, text="תאור", font=("", 20, 'underline'), pady=10, padx=10).grid(row=i, column=1)
+
+        i=i+1
+        for t in tasks:
+            Label(self.cpef, text="   " + t[1] + "   ", font=("", 20), pady=10, padx=10).grid(row=i, column=2)
+            Label(self.cpef, text="   " + t[6] + "   ", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
+            i = i + 1
+
+        Label(self.cpef, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=2)
+        Label(self.cpef, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
+
+
+
+        self.cpef.pack()
+
+
+
+
+
+
+
+    def cus_show_task_frame(self):
+        self.head["text"] = "משימות הפרויקט"
+        def back():
+            self.dshtf.forget()
+            self.cus_proj_editor_frame()
+
+        self.cpef.forget()
+
+        Button(self.cshtf, text="חזור", bd=3, font=("", 15), padx=1, pady=1, command=back, ).grid(row=3, column=0)
+
+        Label(self.cshtf, text=":מזהה של משימה ", font=("", 20), pady=10, padx=10).grid(
+            row=1, column=1
+        )
+        Entry(self.cshtf, textvariable=self.taskId, bd=5, font=("", 15)).grid(
+            row=1, column=0
+        )
+
+        Button(
+            self.cshtf,
+            text="הצג",
+            bd=3,
+            font=("", 15),
+            padx=1,
+            pady=1,
+            command=self.cus_task_frame,
+        ).grid(row=2, column=0)
+
+        self.cshtf.pack()
+
+    def cus_task_frame(self):
+        t = TASK.get_task(self.taskId.get(), self.prjNum.get())
+        if not t:
+            ms.showerror("error", "המשימה המבוקשת לא נמצאת")
+            return
+
+        def back():
+            self.ctf.forget()
+            self.dev_task_frame()
+
+
+
+        self.time.set(t[2])
+        self.crew.set(t[3])
+        self.status.set(t[4])
+        self.priorty.set(t[5])
+        self.description.set(t[6])
+        self.cshtf.forget()
+
+        Label(self.ctf, text=":מזהה משימה ", font=("", 20), pady=10, padx=10).grid(
+            row=0, column=1
+        )
+        Label(self.ctf, text=self.taskId.get(), font=("", 20), pady=10, padx=10).grid(
+            row=0, column=0
+        )
+        Label(self.ctf, text=":מספר שעות מוערך להשלמת משימה ", font=("", 20), pady=10, padx=10).grid(
+            row=1, column=1
+        )
+        Label(self.ctf, text=self.time.get(), font=("", 20), pady=10, padx=10).grid(
+            row=1, column=0
+        )
+        Label(self.ctf, text=":כמות אנשי צוות דרוש ", font=("", 20), pady=10, padx=10).grid(
+            row=2, column=1
+        )
+        Label(self.ctf, text=self.crew.get(), font=("", 20), pady=10, padx=10).grid(
+            row=2, column=0
+        )
+        Label(self.ctf, text=" :סטאטוס", font=("", 20), pady=10, padx=10).grid(
+            row=3, column=1
+        )
+        Label(self.ctf, text=self.status.get(), font=("", 20), pady=10, padx=10).grid(
+            row=3, column=0
+        )
+        Label(self.ctf, text=" :סטאטוס", font=("", 20), pady=10, padx=10).grid(
+            row=3, column=1
+        )
+        Label(self.ctf, text=self.status.get(), font=("", 20), pady=10, padx=10).grid(
+            row=3, column=0
+        )
+        Label(self.ctf, text=" :עדיפות", font=("", 20), pady=10, padx=10).grid(
+            row=4, column=1
+        )
+        Label(self.ctf, text=self.priorty.get(), font=("", 20), pady=10, padx=10).grid(
+            row=4, column=0
+        )
+
+        Label(self.ctf, text=" :תיאור", font=("", 20), pady=10, padx=10).grid(
+            row=5, column=1
+        )
+        Label(self.ctf, text=self.description.get(), font=("", 20), pady=10, padx=10).grid(
+            row=5, column=0
+        )
+
+        Button(self.ctf, text="הערות", bd=3, font=("", 15), padx=1, pady=1, command=self.cus_remark_frame, ).grid(
+            row=6,
+            column=1)
+
+        Button(self.ctf, text="חזור", bd=3, font=("", 15), padx=1, pady=1, command=back, ).grid(
+            row=7,
+            column=1)
+
+        self.ctf.pack()
+
+
+    def cus_remark_frame(self):
+        self.ctf.forget()
+
+        def back():
+            self.crf.forget()
+            self.cus_show_task_frame()
+
+        def drow_list(i):
+            remarks = REMARK.get_task_remarks(self.prjNum.get(), self.taskId.get())
+            Label(self.crf, text="************* ", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
+            Label(self.crf, text="************* ", font=("", 20), pady=10, padx=10).grid(row=i, column=0)
+            Label(self.crf, text="************* ", font=("", 20), pady=10, padx=10).grid(row=i, column=2)
+            i = i + 1
+            Label(self.crf, text="הערות קיימות", font=("", 20), pady=10, padx=10).grid(row=i, column=2)
+            i = i + 1
+            Label(self.crf, text="כותרת", font=("", 20, 'underline'), pady=10, padx=10).grid(row=i, column=2)
+            Label(self.crf, text="מאת", font=("", 20, 'underline'), pady=10, padx=10).grid(row=i, column=1)
+            Label(self.crf, text="הערה", font=("", 20, 'underline'), pady=10, padx=10).grid(row=i, column=0)
+            i = i + 1
+            for r in remarks:
+                Label(self.crf, text="   " + r[2] + "   ", font=("", 20), pady=10, padx=10).grid(row=i, column=2)
+                Label(self.crf, text="   " + r[3] + "   ", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
+                Label(self.crf, text="   " + r[4] + "   ", font=("", 20), pady=10, padx=10).grid(row=i, column=0)
+                i = i + 1
+
+            Label(self.crf, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=2)
+            Label(self.crf, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
+            Label(self.crf, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=0)
+            self.crf.pack()
+
+        def add():
+            REMARK.new_remark(self.prjNum.get(), self.taskId.get(), self.title.get(), self.username.get(),
+                              self.remark.get())
+            drow_list(7)
+
+        def remove():
+            REMARK.remove_remark(self.prjNum.get(), self.taskId.get(), self.title.get())
+            drow_list(7)
+
+        self.head["text"] = self.taskId.get() + " הערות על משימה "
+        Label(self.crf, text="כותרת", font=("", 20), pady=10, padx=10).grid(row=1, column=1)
+        Entry(self.crf, textvariable=self.title, bd=5, font=("", 15)).grid(row=1, column=0)
+        Label(self.crf, text="הערה", font=("", 20), pady=10, padx=10).grid(row=2, column=1)
+        Entry(self.crf, textvariable=self.remark, bd=5, font=("", 15)).grid(row=2, column=0)
+        Button(self.crf, text="הוסף הערה", bd=3, font=("", 15), padx=1, pady=1, command=add, ).grid(row=3, column=1)
+
+        Button(self.crf, text="מחק הערה (רשום כותרת הערה)", bd=3, font=("", 15), padx=1, pady=1, command=remove, ).grid(
+            row=4, column=1)
+        Entry(self.crf, textvariable=self.title, bd=5, font=("", 15)).grid(
+            row=4, column=0
+        )
+
+        Button(self.crf, text="חזור", bd=3, font=("", 15), padx=1, pady=1, command=back, ).grid(row=5, column=1)
+
+        drow_list(7)
+        self.crf.pack()
+
+    #########end of customer funcs########################
+
+
+
+
 ###############developer funcs########################
     def d_project_frame(self):
         my_p=PROJECT_CREW.get_developer_projects(self.username.get())
@@ -1342,11 +1689,14 @@ class main:
 
         def chek_proj():
             projs=PROJECT_CREW.get_developer_projects(self.username.get())
+            x=0
             for p in projs:
                 if p[0]== self.prjNum.get():
+                    x=1
                     self.dev_proj_editor_frame()
 
-
+            if x==0:
+                ms.showerror("שגיאה", "הפרויקט המבוקש לא נמצא")
 
 
 
@@ -1412,7 +1762,7 @@ class main:
 
 
         Button(self.dpef, text="משימות", bd=3, font=("", 15), padx=1, pady=1, command=self.dev_task_frame, ).grid(row=5,
-                                                                                                             column=1)
+                                                                                                                  column=1)
         self.prjName.set(proj[1])
         self.prjNum.set(proj[0])
 
@@ -1472,7 +1822,7 @@ class main:
 
 
     def dev_add_task_frame(self):
-        self.dtf.forget()
+        self.dpef.forget()
 
         def back():
             self.datf.forget()
@@ -1510,7 +1860,7 @@ class main:
 
 
     def dev_remove_task_frame(self):
-        self.dtf.forget()
+        self.dpef.forget()
 
         def back():
             self.drtf.forget()
