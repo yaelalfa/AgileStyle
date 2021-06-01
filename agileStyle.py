@@ -872,6 +872,68 @@ class main:
         self.logf.pack_forget()
         self.logf.pack_forget()
         self.head["text"] = "יצירת משתמש"
+        Label(self.crf, text="שם משתמש: ", font=("", 20), pady=10, padx=10).grid(
+            sticky=W
+        )
+        Entry(self.crf, textvariable=self.n_username, bd=5, font=("", 15)).grid(
+            row=0, column=1
+        )
+        Label(self.crf, text="סיסמא: ", font=("", 20), pady=5, padx=5).grid(sticky=W)
+        Entry(
+            self.crf, textvariable=self.n_password, bd=5, font=("", 15), show="*"
+        ).grid(row=1, column=1)
+        Label(self.crf, text="תפקיד: ", font=("", 20), pady=5, padx=5).grid(sticky=W)
+        Entry(self.crf, textvariable=self.n_role, bd=5, font=("", 15)).grid(
+            row=2, column=1
+        )
+        Button(
+            self.crf,
+            text=" יצירת משתמש ",
+            bd=3,
+            font=("", 15),
+            padx=5,
+            pady=5,
+            command=self.new_user,
+        ).grid()
+        Button(
+            self.crf,
+            text="חזור להתחברות ",
+            bd=3,
+            font=("", 15),
+            padx=5,
+            pady=5,
+            command=self.login_frame,
+        ).grid(row=4, column=1)
+
+        # Forgot password widgets
+        Label(self.fpf, text="שם משתמש: ", font=("", 20), pady=10, padx=10).grid(
+            sticky=W
+        )
+        Entry(self.fpf, textvariable=self.findName, bd=5, font=("", 15)).grid(
+            row=0, column=1
+        )
+        Label(self.fpf, text="סיסמא חדשה: ", font=("", 20), pady=5, padx=5).grid(sticky=W)
+        Entry(
+            self.fpf, textvariable=self.resetPass, bd=5, font=("", 15), show="*"
+        ).grid(row=1, column=1)
+        Button(
+            self.fpf,
+            text=" אפס סיסמא",
+            bd=3,
+            font=("", 15),
+            padx=5,
+            pady=5,
+            command=self.forgot_password,
+        ).grid()
+        Button(
+            self.fpf,
+            text="חזור להתחברות ",
+            bd=3,
+            font=("", 15),
+            padx=5,
+            pady=5,
+            command=self.login_frame,
+        ).grid(row=2, column=1)
         self.crf.pack()
 
     def forgot_password_frame(self):
@@ -1207,70 +1269,8 @@ class main:
         self.logf.pack()
 
         # NewUser widgets
-
         self.crf = Frame(self.master, padx=10, pady=10)
-        Label(self.crf, text="שם משתמש: ", font=("", 20), pady=10, padx=10).grid(
-            sticky=W
-        )
-        Entry(self.crf, textvariable=self.n_username, bd=5, font=("", 15)).grid(
-            row=0, column=1
-        )
-        Label(self.crf, text="סיסמא: ", font=("", 20), pady=5, padx=5).grid(sticky=W)
-        Entry(
-            self.crf, textvariable=self.n_password, bd=5, font=("", 15), show="*"
-        ).grid(row=1, column=1)
-        Label(self.crf, text="תפקיד: ", font=("", 20), pady=5, padx=5).grid(sticky=W)
-        Entry(self.crf, textvariable=self.n_role, bd=5, font=("", 15)).grid(
-            row=2, column=1
-        )
-        Button(
-            self.crf,
-            text=" יצירת משתמש ",
-            bd=3,
-            font=("", 15),
-            padx=5,
-            pady=5,
-            command=self.new_user,
-        ).grid()
-        Button(
-            self.crf,
-            text="חזור להתחברות ",
-            bd=3,
-            font=("", 15),
-            padx=5,
-            pady=5,
-            command=self.login_frame,
-        ).grid(row=4, column=1)
-
-        # Forgot password widgets
-        Label(self.fpf, text="שם משתמש: ", font=("", 20), pady=10, padx=10).grid(
-            sticky=W
-        )
-        Entry(self.fpf, textvariable=self.findName, bd=5, font=("", 15)).grid(
-            row=0, column=1
-        )
-        Label(self.fpf, text="סיסמא חדשה: ", font=("", 20), pady=5, padx=5).grid(sticky=W)
-        Entry(
-            self.fpf, textvariable=self.resetPass, bd=5, font=("", 15), show="*"
-        ).grid(row=1, column=1)
-        Button(
-            self.fpf,
-            text=" אפס סיסמא",
-            bd=3,
-            font=("", 15),
-            padx=5,
-            pady=5,
-            command=self.forgot_password,
-        ).grid()
-        Button(
-            self.fpf,
-            text="חזור להתחברות ",
-            bd=3,
-            font=("", 15),
-            padx=5,
-            pady=5,
-            command=self.login_frame,
-        ).grid(row=2, column=1)
+       
 
         # Developer Widgets
         self.df = Frame(self.master, padx=20, pady=30)
