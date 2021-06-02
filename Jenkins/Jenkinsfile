@@ -25,11 +25,7 @@ pipeline{
                 sh 'python -m py_compile functionsTest.py'
 
             }
-            post {
-                always {
-                    junit 'test-reports/Results.xml'
-                }
-            }
+           
         }
         stage('Integration Test') {
                     steps{
