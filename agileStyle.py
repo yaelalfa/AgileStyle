@@ -1524,7 +1524,7 @@ class main:
         Label(self.dfc, text=":תיאור הפרוייקט ", font=("", 20), pady=40, padx=30).grid(
             row=2, column=1
         )
-        Entry(self.dfc, textvariable= self.discriptuon, bd=5, font=("", 15)).grid(
+        Entry(self.dfc, textvariable= self.discriptuon,bd=10, font=("",20 ),width="80").grid(
             row=2, column=0
         )
         self.dfc.pack()
