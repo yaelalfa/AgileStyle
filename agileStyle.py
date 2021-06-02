@@ -70,12 +70,12 @@ sql = '''CREATE TABLE IF NOT EXISTS projects
         managerId VARCHAR(255) )'''
 cc.execute(sql)
 
-#sql = '''DROP TABLE project_tasks
-#          '''
+#sql = '''DROP TABLE userstory#
+# /          '''
 #cc.execute(sql)
 
 sql = '''CREATE TABLE IF NOT EXISTS userstory 
-        (projectid VARCHAR(255) PRIMARY KEY ,
+        (projectid VARCHAR(700) PRIMARY KEY ,
         project_description VARCHAR(255))
         '''
 cc.execute(sql)
@@ -307,7 +307,23 @@ class PROJECT:
         connect.commit()
         
 # *************end of project class**********************************#
+class DISCRIPTION:
+    def __init__(self, projNum,discription):
+        self.projnum=projNum
+        self.discription= discription
+    def insert_to_table(self):
+        conect=users
+        cc= conect.cursor(buffered=True)
+        sql='''INSERT INTO userstory VALUES(%s,%s)'''
+        dats_tuple = (self.projnum,self.discription)
+        try:
+            cc.execute(sql,dats_tuple)
+            ms.showinfo("תיאור חדש נוצרה בהצלחה")
 
+        except Exception:
+            ms.showerror("שגיאה! נסיון להכניס תיאור חדש לטבלה נכשל")
+
+        conect.commit()
 # **************task class*********************************#
 class TASK:
     def __init__(self,taskId, time, crewN, projId, status,priorty,description):
@@ -1490,11 +1506,14 @@ class main:
         def back():
             self.dfc.forget()
             self.enter_discription_fram()
-
-        self.cpef.forget()
+        
+        def add_disc():
+            t = DISCRIPTION(self.prjNum.get(), self.discriptuon.get())
+            t.insert_to_table()
+        self.dfc.forget()
 
         Button(self.dfc, text="חזור", bd=3, font=("", 15), padx=1, pady=1, command=back, ).grid(row=3, column=0)
-        Button(self.dfc, text="הכנס", bd=3, font=("", 15), padx=1, pady=1, command=back, ).grid(row=3, column=1)
+        Button(self.dfc, text="הכנס", bd=3, font=("", 15), padx=1, pady=1, command = add_disc, ).grid(row=3, column=1)
 
         Label(self.dfc, text=":מזהה של פרוייקט ", font=("", 20), pady=10, padx=10).grid(
             row=1, column=1
