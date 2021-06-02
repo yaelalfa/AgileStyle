@@ -22,7 +22,7 @@ pipeline{
             }
             steps {
                 echo 'running test stage'
-                sh 'functionsTest.py'
+                sh 'python -m py_compile functionsTest.py'
 
             }
             post {
