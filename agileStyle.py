@@ -1484,6 +1484,18 @@ class main:
 
 
     def enter_discription_fram(self):
+        self.head["text"] = "תיאור הפרוייקט"
+        self.cshtf.forget()
+        self.cusf.forget()
+        def back():
+            self.dfc.forget()
+            self.enter_discription_fram()
+
+        self.cpef.forget()
+
+        Button(self.dfc, text="חזור", bd=3, font=("", 15), padx=1, pady=1, command=back, ).grid(row=3, column=0)
+        Button(self.dfc, text="הכנס", bd=3, font=("", 15), padx=1, pady=1, command=back, ).grid(row=3, column=1)
+
         Label(self.dfc, text=":מזהה של פרוייקט ", font=("", 20), pady=10, padx=10).grid(
             row=1, column=1
         )
@@ -1491,11 +1503,12 @@ class main:
             row=1, column=0
         )
         Label(self.dfc, text=":תיאור הפרוייקט ", font=("", 20), pady=40, padx=30).grid(
-            row=1, column=1
+            row=2, column=1
         )
         Entry(self.dfc, textvariable= self.discriptuon, bd=5, font=("", 15)).grid(
-            row=1, column=0
+            row=2, column=0
         )
+        self.dfc.pack()
 
     def cus_show_task_frame(self):
         self.head["text"] = "משימות הפרויקט"
