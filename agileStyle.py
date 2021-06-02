@@ -46,6 +46,7 @@ users.cursor().execute(
     "CREATE TABLE IF NOT EXISTS users (username VARCHAR(255) PRIMARY KEY ,password VARCHAR(255), role VARCHAR(255))"
 )
 
+
 #print(users.cursor().execute("SELECT username,role FROM users").fetchall())
 
 Maneger = "manager"
@@ -72,6 +73,12 @@ cc.execute(sql)
 #sql = '''DROP TABLE project_tasks
 #          '''
 #cc.execute(sql)
+
+sql = '''CREATE TABLE IF NOT EXISTS userstory 
+        (projectid VARCHAR(255) PRIMARY KEY ,
+        project_description VARCHAR(255))
+        '''
+cc.execute(sql)
 
 sql = '''CREATE TABLE IF NOT EXISTS project_tasks
          (projId VARCHAR(255) NOT NULL,
@@ -744,6 +751,7 @@ class main:
         # Window
         self.master = master
         # Some Usefull variables
+        self.discriptuon = StringVar()
         self.username = StringVar()
         self.password = StringVar()
         self.role = StringVar()
@@ -1016,11 +1024,18 @@ class main:
         self.head["text"] = "לקוח"
         projs=PROJECT_customer.get_proj(self.username.get())
 
-
+        
         for p in projs:
             print(p[0])
 
-
+        Button(self.cusf,
+               text=" הכנסת תיאור פרוייקט",
+               bd=3,
+               font=("", 15),
+               padx=5,
+               pady=5,
+               command=self.enter_discription_fram,
+               ).grid(row=4, column=1)
         Button(self.cusf,
                text=" פתח פרויקט",
                bd=3,
@@ -1030,6 +1045,7 @@ class main:
                command=self.cus_show_proj_frame,
                ).grid(row=1, column=1)
 
+        
         Button(self.cusf,
                text=" סכימה ",
                bd=3,
@@ -1046,7 +1062,7 @@ class main:
                pady=5,
                command=self.login_frame,
                ).grid(row=3, column=1)
-
+       
         i = 6
         Label(self.cusf, text="*******************", font=("", 20), pady=10, padx=10).grid(row=i, column=0)
         Label(self.cusf, text="*******************", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
@@ -1313,7 +1329,7 @@ class main:
         self.drf= Frame(self.master, padx=20, pady=30)  # developer remark  frame
 
         self.pcf = Frame(self.master, padx=20, pady=30)  # project customer frame
-
+        self.dfc = Frame(self.master, padx=50, pady=50)  # customer show discription frame
         self.cspf = Frame(self.master, padx=20, pady=30)  # customer show project frame
         self.cpef = Frame(self.master, padx=20, pady=30)  # customer project editor frame
         self.cshtf = Frame(self.master, padx=20, pady=30)  # customer show task frame
@@ -1467,7 +1483,19 @@ class main:
 
 
 
-
+    def enter_discription_fram(self):
+        Label(self.dfc, text=":מזהה של פרוייקט ", font=("", 20), pady=10, padx=10).grid(
+            row=1, column=1
+        )
+        Entry(self.dfc, textvariable= self.prjNum, bd=5, font=("", 15)).grid(
+            row=1, column=0
+        )
+        Label(self.dfc, text=":תיאור הפרוייקט ", font=("", 20), pady=40, padx=30).grid(
+            row=1, column=1
+        )
+        Entry(self.dfc, textvariable= self.discriptuon, bd=5, font=("", 15)).grid(
+            row=1, column=0
+        )
 
     def cus_show_task_frame(self):
         self.head["text"] = "משימות הפרויקט"
