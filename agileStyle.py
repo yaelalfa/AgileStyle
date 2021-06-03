@@ -1436,12 +1436,12 @@ class main:
 
 
         Button(self.cpef,
-               text=" מצב משימות ",
+               text=" שהושלמו משימות ",
                bd=3,
                font=("", 15),
                padx=5,
                pady=5,
-               command=self.show_proj_frame_c,
+               command=self.complete_task,
                ).grid(row=4, column=1)
 
 
@@ -2405,6 +2405,27 @@ class main:
         Button(self.pefc, text="חזור", bd=3, font=("", 15), padx=1, pady=1, command=back, ).grid(row=5, column=1)
         self.pefc.pack()
 
+    def complete_task(self,projid):
+        connect = users
+        cc = connect.cursor(buffered=True)
+
+        sql = """SELECT * 
+            FROM project_tasks 
+            where projId=%s  AND status="DONE"       
+
+                            """
+        dt = (id,)
+        cc.execute(sql, dt)
+        user = cc.fetchone()
+
+        if not user:
+            ms.showerror("error", "project not exists")
+            return 0
+
+        ru = user[0]
+        return ru
+
+        connect.commit()
 
     
     def crew_frame(self):
