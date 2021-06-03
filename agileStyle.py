@@ -2,20 +2,12 @@ import tkinter
 from tkinter import *
 from tkinter import messagebox as ms
 import tkinter as tk
-import sqlite3
 import mysql.connector
-#import matplotlib
-#import plotly.express as px
-#import pandas as pd
-#from dateutil.rrule import WEEKLY
-#from matplotlib import font_manager
-#from matplotlib.backends.backend_tkagg import (
-#    FigureCanvasTkAgg, NavigationToolbar2Tk)
-# Implement the default Matplotlib key bindings.
-#from matplotlib.backend_bases import key_press_handler
-#from matplotlib.dates import rrulewrapper, DateFormatter, RRuleLocator
-#from matplotlib.figure import Figure
-#import matplotlib.pyplot as plt
+import matplotlib
+from matplotlib.backends._backend_tk import NavigationToolbar2Tk
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.figure import Figure
+import matplotlib.pyplot as plt
 
 #import numpy as np
 
@@ -98,7 +90,32 @@ sql = '''CREATE TABLE IF NOT EXISTS project_crew
           PRIMARY KEY (projId,user))
           '''
 cc.execute(sql)
+sql = '''CREATE TABLE IF NOT EXISTS sprints 
+         (
+          sprintNum VARCHAR(255) NOT NULL,
+          projectId VARCHAR(255) NOT NULL,
+          timeLeft VARCHAR(255) NOT NULL,
+          status VARCHAR(255) NOT NULL,
+          PRIMARY KEY (sprintNum,projectId)
+        )
+          '''
+cc.execute(sql)
 
+conect.commit()
+
+sql = '''CREATE TABLE IF NOT EXISTS taskSprint 
+         (
+          taskId VARCHAR(255) NOT NULL,
+          projectId VARCHAR(255) NOT NULL,
+          sprintNum VARCHAR(255) NOT NULL,
+          description VARCHAR(255) ,
+          PRIMARY KEY (taskId,projectId,sprintNum)
+        )
+          '''
+
+cc.execute(sql)
+
+conect.commit()
 sql = '''CREATE TABLE IF NOT EXISTS user_message
          (
           sender VARCHAR(255) NOT NULL,
@@ -305,7 +322,223 @@ class PROJECT:
         except Exception:
             ms.showerror("שגיאה", "שגיאה בזמן משיכת פרויקט")
         connect.commit()
-        
+
+    # **************class Sprint*********************************#
+
+
+class SPRINT:
+    def __init__(self, sprintNum, projectId, timeLeft, status):
+        self.sprintNum = sprintNum
+        self.projectId = projectId
+        self.timeLeft = timeLeft
+        self.status = status
+
+    def get_sprints(cls, pid):
+        connect = users
+        cc = connect.cursor(buffered=True)
+
+        sql = """SELECT * 
+                         FROM sprints
+                         where  projectId=%s      
+
+                                         """
+        dt = (pid,)
+
+        try:
+
+            cc.execute(sql, dt)
+            rows = cc.fetchall()
+            return rows
+        except Exception:
+            ms.showerror("error", "שגיאה בזמן משיכת ספרינט")
+
+        connect.commit()
+
+    def get_sprints_by_num(sid, pid):
+        connect = users
+        cc = connect.cursor(buffered=True)
+
+        sql = """SELECT * 
+                         FROM sprints
+                         WHERE  sprintNum=%s
+                         AND projectId=%s      
+
+                                         """
+        dt = (sid, pid,)
+
+        try:
+
+            cc.execute(sql, dt)
+            rows = cc.fetchall()
+            return rows
+        except Exception:
+            ms.showerror("error", "שגיאה בזמן משיכת ספרינט")
+
+        connect.commit()
+
+    def insert_to_table(self):
+        conect = users
+        cc = conect.cursor(buffered=True)
+        sql = '''INSERT INTO sprints VALUES(%s,%s,%s,%s)
+          '''
+        dats_tuple = (self.sprintNum, self.projectId, self.timeLeft, self.status)
+
+        try:
+            cc.execute(sql, dats_tuple)
+            ms.showinfo("הושלם", "ספרינט חדש נוצר בהצלחה")
+
+        except Exception:
+            ms.showerror("שגיאה", "שגיאה! נסיון להכניס משימה חדשה לטבלה נכשל")
+
+        conect.commit()
+
+    @classmethod
+    def delete_sprint(cls, pid, sid):
+        connect = users
+        cc = connect.cursor(buffered=True)
+
+        sql = """DELETE FROM sprints
+                             where  projectId=%s  
+                             AND sprintNum=%s
+
+                                             """
+        dt = (pid, sid)
+
+        try:
+
+            cc.execute(sql, dt)
+            ms.showinfo("", "ספרינט נמחק בהצלחה")
+        except Exception:
+            ms.showerror("error", "שגיאה ניסיון מחיקת ספרינט ")
+
+        connect.commit()
+
+    @classmethod
+    def update_num(cls, pid, sid, time, status):
+        connect = users
+        c = connect.cursor(buffered=True)
+        sql = """UPDATE sprints
+                                 SET sprintNum=%s
+                                 WHERE projectId=%s  
+                                 AND timeLeft=%s
+                                 AND status=%s    
+
+                                                 """
+        dt = (sid, pid, time, status)
+        try:
+
+            cc.execute(sql, dt)
+            ms.showinfo("", "מספר הספרינט עודכן בהצלחה ")
+        except Exception:
+            ms.showerror("error", "שגיאה בעידכון מספר ספרינט ")
+
+        connect.commit()
+
+    @classmethod
+    def update_time(cls, pid, sid, time, status):
+        connect = users
+        c = connect.cursor(buffered=True)
+        sql = """UPDATE sprints
+                                 SET timeLeft=%s
+                                 WHERE projectId=%s  
+                                 AND sprintNum=%s 
+
+                                                 """
+        dt = (time, pid, sid)
+        try:
+
+            cc.execute(sql, dt)
+            ms.showinfo("", "מספר ימים עודכן בהצלחה ")
+        except Exception:
+            ms.showerror("error", "שגיאה בעידכון מספר ימים ")
+
+        connect.commit()
+
+    @classmethod
+    def update_status(cls, pid, sid, time, status):
+        connect = users
+        c = connect.cursor(buffered=True)
+        sql = """UPDATE sprints 
+                            SET status=%s 
+                            where projectId=%s 
+                            AND sprintNum=%s
+                            """
+        dt = (status, pid, sid)
+        try:
+
+            cc.execute(sql, dt)
+            ms.showinfo("", "סטאטוס עודכן בהצלחה ")
+            connect.commit()
+        except Exception:
+            ms.showerror("error", "שגיאה בעידכון סטאטוס ")
+
+        connect.commit()
+
+
+class TASK_SPRINT:
+    def __init__(self, taskId, projectId, sprintNum):
+        self.sprintNum = sprintNum
+        self.projectId = projectId
+        self.taskId = taskId
+
+    def addTask(tid, pid, sid, des):
+        conect = users
+        cc = conect.cursor(buffered=True)
+        sql = '''INSERT INTO taskSprint VALUES(%s,%s,%s,%s)
+                  '''
+        dats_tuple = (tid, pid, sid, des,)
+
+        try:
+            cc.execute(sql, dats_tuple)
+            ms.showinfo("משימה נוספה בהצלחה")
+
+        except Exception:
+            ms.showerror("שגיאה! נסיון להכניס משימה חדשה לטבלה נכשל")
+
+        conect.commit()
+
+    def deleteTask(tid, pid, sid):
+        connect = users
+        cc = connect.cursor(buffered=True)
+
+        sql = """DELETE FROM taskSprint
+                                     where  projectId=%s  
+                                     AND sprintNum=%s
+                                     AND taskId=%s
+
+                                                     """
+        dt = (pid, sid, tid)
+
+        try:
+
+            cc.execute(sql, dt)
+            ms.showinfo("", "משימה הוסרה בהצלחה")
+        except Exception:
+            ms.showerror("error", "שגיאה ניסיון הסרת משימה ")
+
+        connect.commit()
+
+    def get_sprint_tasks(pid, sid):
+        connect = users
+        cc = connect.cursor(buffered=True)
+
+        sql = """SELECT * FROM taskSprint WHERE projectId=%s AND sprintNum=%s
+                                         """
+        dt = (pid, sid,)
+
+        try:
+
+            cc.execute(sql, dt)
+            rows = cc.fetchall()
+            print(rows)
+
+            return rows
+        except Exception:
+            ms.showerror("error", "שגיאה בזמן משיכת משימות לספרינט")
+
+        connect.commit()
+
+
 # *************end of project class**********************************#
 class DISCRIPTION:
     def __init__(self, projNum,discription):
@@ -792,6 +1025,10 @@ class main:
         self.title=StringVar()
         self.remark=StringVar()
         self.cust_username=StringVar()
+        self.sprintNum = StringVar()
+        self.sprintTime = StringVar()
+        self.sprintStatus = StringVar()
+        self.messageTo = StringVar()
 
     # Login Function
     def login(self):
@@ -1195,7 +1432,7 @@ class main:
         self.cusf.pack_forget()
         self.cf.pack_forget()
         self.head["text"] = "סכימת התקדמות"
-        self.schema(self.cusf)
+        self.schema(self.scc)
 
         Button(
             self.scc,
@@ -1210,42 +1447,28 @@ class main:
 
     def schema(self,f):
         projectAssign = PROJECT_CREW.get_project(self.username.get())
-        ylabels = []
-        xlabels = []
-        if projectAssign != None:
+
+        y1 = y2 = x = []
+        if projectAssign is not None:
             tasks = TASK.get_tasks(projectAssign[0])
-            print(tasks)
-            crew = PROJECT_CREW.get_crew(projectAssign[0])
-            fig = Figure(figsize=(5, 5),
-                         dpi=100)
+            numTasks = len(tasks)
+            for t in tasks:
+                if t[0] == projectAssign[0]:
+                    if t[4] == 'DEF' or t[4] == 'DEFF':
+                        numTasks = numTasks - 1
 
-            # list of squares
-            y = [i ** 2 for i in range(101)]
+            x = [projectAssign[0]]
+            y1 = [numTasks * 10]
+            y2 = [100]
 
-            # adding the subplot
-            plot1 = fig.add_subplot(111)
-
-            # plotting the graph
-            plot1.plot(y)
-
-            # creating the Tkinter canvas
-            # containing the Matplotlib figure
-            canvas = FigureCanvasTkAgg(fig,
-                                       master=f)
-            canvas.draw()
-
-            # placing the canvas on the Tkinter window
-            canvas.get_tk_widget().pack()
-
-            # creating the Matplotlib toolbar
-            toolbar = NavigationToolbar2Tk(canvas,
-                                           f)
-            toolbar.update()
-
-            # placing the toolbar on the Tkinter window
-            canvas.get_tk_widget().pack()
-
-            self.iframe5.pack(expand=1, fill=X, pady=10, padx=5)
+        print(x)
+        fig = plt.figure(figsize=(4, 5))
+        ax = fig.add_subplot(111)
+        plt.bar(x, y1, color='r')
+        plt.bar(x, y2, bottom=y1, color='b')
+        canvas = FigureCanvasTkAgg(fig, master=self.scc)
+        canvas.draw()
+        canvas.get_tk_widget().grid(row=0, column=0, ipadx=40, ipady=20)
 
     ## DRAW WIDGETS ##
     def widgets(self):
@@ -1352,6 +1575,15 @@ class main:
         self.ctf = Frame(self.master, padx=20, pady=30)  #   customer task frame  ( cus_task_fram)
         self.crf = Frame(self.master, padx=20, pady=30)  # customer remark  frame
 
+        self.sf = Frame(self.master, padx=20, pady=30)  # sprints frame
+        self.asf = Frame(self.master, padx=20, pady=30)  # add sprint frame
+        self.esf = Frame(self.master, padx=20, pady=30)  # edit sprint frame
+        self.rsf = Frame(self.master, padx=20, pady=30)  # remove sprint frame
+        self.ssf = Frame(self.master, padx=20, pady=30)  # show sprint frame
+        self.ssfm = Frame(self.master, padx=20, pady=30)  # show sprint frame main
+        self.atts = Frame(self.master, padx=20, pady=30)  # add task to sprint frame
+        self.tas = Frame(self.master, padx=20, pady=30)  # add task to sprint frame
+        self.dtfs = Frame(self.master, padx=20, pady=30)  # delete task from sprint frame
 
 
 #########customer funcs########################
@@ -1505,7 +1737,7 @@ class main:
         self.cusf.forget()
         def back():
             self.dfc.forget()
-            self.enter_discription_fram()
+            self.custumer_frame()
         
         def add_disc():
             t = DISCRIPTION(self.prjNum.get(), self.discriptuon.get())
@@ -2326,6 +2558,7 @@ class main:
 
         self.spfc.pack()
     def proj_editor_frame(self):
+        self.sf.forget()
         proj = PROJECT.get_project(self.username.get(), self.prjNum.get())
         if not proj:
             ms.showerror("שגיאה", "הפרויקט המבוקש לא נמצא")
@@ -2349,8 +2582,10 @@ class main:
 
         Button(self.pef, text="שייך לקוחות לפרויקט", bd=3, font=("", 15), padx=1, pady=1, command=self.proj_cust_frame, ).grid(row=5,column=1)
 
-
-        Button(self.pef, text="חזור", bd=3, font=("", 15), padx=1, pady=1, command=back, ).grid(row=6, column=1)
+        Button(self.pef, text="ספרינטים", bd=3, font=("", 15), padx=1, pady=1, command=self.sprints_frame, ).grid(
+            row=6,
+            column=1)
+        Button(self.pef, text="חזור", bd=3, font=("", 15), padx=1, pady=1, command=back, ).grid(row=7, column=1)
 
         self.pef.pack()
 
@@ -2619,6 +2854,496 @@ class main:
         self.apf.pack()
 
     ###################end project editor functions##############################
+    ####### Sprints editor #######
+    def sprints_frame(self):
+        self.apf.forget()
+        self.pef.forget()
+        self.pf.forget()
+        self.asf.forget()
+        self.ssf.forget()
+        self.rsf.forget()
+        self.esf.forget()
+        self.ssfm.forget()
+        self.head["text"] = "ספרינטים"
+        Button(
+            self.sf,
+            text="הוסף ספרינט",
+            bd=3,
+            font=("", 15),
+            padx=1,
+            pady=1,
+            command=self.add_sprint_frame,
+        ).grid(row=0, column=0)
+        Button(
+            self.sf,
+            text="מחק ספרינט",
+            bd=3,
+            font=("", 15),
+            padx=1,
+            pady=1,
+            command=self.remove_sprint_frame,
+        ).grid(row=1, column=0)
+        Button(
+            self.sf,
+            text="הצג ספרינט",
+            bd=3,
+            font=("", 15),
+            padx=1,
+            pady=1,
+            command=self.show_sprint_frame,
+        ).grid(row=2, column=0)
+
+        sprints = SPRINT(self.sprintNum.get(),
+                         self.prjNum.get(), self.sprintTime.get(), self.sprintStatus.get())
+        s = sprints.get_sprints(self.prjNum.get())
+
+        Label(self.sf, text="מספר ספרינט", font=("", 20, 'underline'), pady=10, padx=10).grid(row=9, column=2)
+        Label(self.sf, text="ימים", font=("", 20, 'underline'), pady=10, padx=10).grid(row=9, column=1)
+        Label(self.sf, text="סטאטוס", font=("", 20, 'underline'), pady=10, padx=10).grid(row=9, column=0)
+        i = 10
+        for t in s:
+            Label(self.sf, text="   " + t[0] + "   ", font=("", 20), pady=10, padx=10).grid(row=i, column=2)
+            Label(self.sf, text="   " + t[2] + "   ", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
+            Label(self.sf, text="   " + t[3] + "   ", font=("", 20), pady=10, padx=10).grid(row=i, column=0)
+            i = i + 1
+
+        Label(self.sf, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=2)
+        Label(self.sf, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
+        Label(self.sf, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=0)
+        i = i + 1
+        Label(self.sf, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=2)
+        Label(self.sf, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
+        Label(self.sf, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=0)
+        i = i + 1
+        Button(
+            self.sf,
+            text="חזור",
+            bd=3,
+            font=("", 15),
+            padx=1,
+            pady=1,
+            command=self.proj_editor_frame,
+        ).grid(row=i, column=0)
+        self.sf.pack()
+
+    def add_sprint_frame(self):
+        self.sf.forget()
+        self.pef.forget()
+        self.pf.forget()
+        self.apf.forget()
+
+        def add():
+            t = SPRINT(self.sprintNum.get(), self.prjNum.get(), self.sprintTime.get(), self.sprintStatus.get())
+            t.insert_to_table()
+
+        self.head["text"] = "הוספת ספרינט"
+
+        Label(self.asf, text="מספר הספרינט: ", font=("", 20), pady=10, padx=10).grid(
+            row=0, column=0
+        )
+
+        Entry(self.asf, textvariable=self.sprintNum, bd=5, font=("", 15)).grid(
+            row=0, column=1
+        )
+        Label(self.asf, text="ימים: ", font=("", 20), pady=10, padx=10).grid(row=1, column=0)
+        Entry(self.asf, textvariable=self.sprintTime, bd=5, font=("", 15)).grid(row=1, column=1)
+
+        Label(self.asf, text="סטאטוס: ", font=("", 20), pady=10, padx=10).grid(row=2, column=0)
+        Entry(self.asf, textvariable=self.sprintStatus, bd=5, font=("", 15)).grid(row=2, column=1)
+        Button(
+            self.asf,
+            text="הוסף",
+            bd=3,
+            font=("", 15),
+            padx=1,
+            pady=1,
+            command=add,
+        ).grid(row=3, column=1)
+
+        Button(
+            self.asf,
+            text="חזור",
+            bd=3,
+            font=("", 15),
+            padx=1,
+            pady=1,
+            command=self.sprints_frame,
+        ).grid(row=3, column=2)
+
+        self.asf.pack()
+
+    def edit_sprint_frame(self):
+        self.sf.forget()
+        self.ssfm.forget()
+        self.ssf.forget()
+        self.head["text"] = "עריכת ספרינט"
+        s = SPRINT.get_sprints_by_num(self.sprintNum.get(), self.prjNum.get())
+
+        def change_n():
+            SPRINT.update_num(self.sprintNum.get(), self.prjNum.get(), self.sprintTime.get(), self.sprintStatus.get())
+            self.edit_sprint_frame()
+
+        def change_t():
+            SPRINT.update_time(self.sprintNum.get(), self.prjNum.get(), self.sprintTime.get(), self.sprintStatus.get())
+            self.edit_sprint_frame()
+
+        def change_s():
+            SPRINT.update_status(self.sprintNum.get(), self.prjNum.get(), self.sprintTime.get(),
+                                 self.sprintStatus.get())
+            self.edit_sprint_frame()
+
+        Label(self.esf, text=":מספר ספרינט ", font=("", 20), pady=10, padx=10).grid(
+            row=0, column=1
+        )
+        Label(self.esf, text=s[0][0], font=("", 20), pady=10, padx=10).grid(
+            row=0, column=0
+        )
+        Label(self.esf, text=":ימים ", font=("", 20), pady=10, padx=10).grid(
+            row=1, column=1
+        )
+        Label(self.esf, text=s[0][2], font=("", 20), pady=10, padx=10).grid(
+            row=1, column=0
+        )
+        Label(self.esf, text=":סטאטוס ", font=("", 20), pady=10, padx=10).grid(
+            row=2, column=1
+        )
+        Label(self.esf, text=s[0][3], font=("", 20), pady=10, padx=10).grid(
+            row=2, column=0
+        )
+
+        Entry(self.esf, textvariable=self.sprintNum, bd=5, font=("", 15)).grid(row=5, column=0)
+        Button(self.esf, text="שנה מספר ספרינט ", bd=3, font=("", 15), padx=1, pady=1, command=change_n, ).grid(row=5,
+                                                                                                                column=1)
+
+        Entry(self.esf, textvariable=self.sprintTime, bd=5, font=("", 15)).grid(row=6, column=0)
+        Button(self.esf, text="שנה מספר ימים", bd=3, font=("", 15), padx=1, pady=1, command=change_t, ).grid(row=6,
+                                                                                                             column=1)
+
+        Entry(self.esf, textvariable=self.sprintStatus, bd=5, font=("", 15)).grid(row=7, column=0)
+        Button(self.esf, text="שנה סטאטוס", bd=3, font=("", 15), padx=1, pady=1, command=change_s, ).grid(row=7,
+                                                                                                          column=1)
+
+        Button(
+            self.esf,
+            text="חזור",
+            bd=3,
+            font=("", 15),
+            padx=1,
+            pady=1,
+            command=self.sprints_frame,
+        ).grid(row=8, column=2)
+
+        self.esf.pack()
+
+    def remove_sprint_frame(self):
+        self.sf.forget()
+        self.tf.forget()
+
+        def back():
+            self.rsf.forget()
+            self.sprints_frame()
+
+        def remove():
+            SPRINT.delete_sprint(self.prjNum.get(), self.sprintNum.get())
+            self.sprints_frame()
+
+        Button(self.rsf, text="חזור", bd=3, font=("", 15), padx=1, pady=1, command=back, ).grid(row=3, column=0)
+
+        Label(self.rsf, text=":מספר הספרינט ", font=("", 20), pady=10, padx=10).grid(
+            row=1, column=1
+        )
+        Entry(self.rsf, textvariable=self.sprintNum, bd=5, font=("", 15)).grid(
+            row=1, column=0
+        )
+
+        Button(
+            self.rsf,
+            text="מחק",
+            bd=3,
+            font=("", 15),
+            padx=1,
+            pady=1,
+            command=remove,
+        ).grid(row=2, column=0)
+
+        self.rsf.pack()
+
+    def show_sprint_frame(self):
+        self.sf.forget()
+        self.apf.forget()
+        self.ssfm.forget()
+        self.head["text"] = "הצגת ספרינט"
+
+        def show():
+            self.ssf.forget()
+            if not SPRINT.get_sprints_by_num(self.prjNum.get(), self.sprintNum.get()):
+                ms.showerror("שגיאה", "הספרינט המבוקש לא נמצא")
+                return
+            self.show_sprint_frame_main()
+
+        Label(self.ssf, text=":מספר ספרינט ", font=("", 20), pady=10, padx=10).grid(row=0, column=0)
+
+        Entry(self.ssf, textvariable=self.sprintNum, bd=5, font=("", 15)).grid(row=0, column=1)
+        Button(self.ssf, text="הצג", bd=3,
+               font=("", 15), padx=1, pady=1,
+               command=show,
+               ).grid(row=2, column=0)
+        Button(
+            self.ssf,
+            text="חזור",
+            bd=3,
+            font=("", 15),
+            padx=1,
+            pady=1,
+            command=self.sprints_frame,
+        ).grid(row=3, column=2)
+
+        self.ssf.pack()
+
+    def show_sprint_frame_main(self):
+        self.ssf.forget()
+        self.tas.forget()
+        self.head["text"] = "הצגת ספרינט"
+        t=SPRINT.get_sprints_by_num(self.sprintNum.get(),self.prjNum.get())
+        Label(self.ssfm, text=":מספר ספרינט ", font=("", 20), pady=10, padx=10).grid(
+            row=0, column=1
+        )
+        Label(self.ssfm, text=self.sprintNum.get(), font=("", 20), pady=10, padx=10).grid(
+            row=0, column=0
+        )
+        Label(self.ssfm, text=":ימים ", font=("", 20), pady=10, padx=10).grid(
+            row=1, column=1
+        )
+        Label(self.ssfm, text=t[0][2], font=("", 20), pady=10, padx=10).grid(
+            row=1, column=0
+        )
+        Label(self.ssfm, text=":סטאטוס ", font=("", 20), pady=10, padx=10).grid(
+            row=2, column=1
+        )
+        Label(self.ssfm, text=t[0][3], font=("", 20), pady=10, padx=10).grid(
+            row=2, column=0
+        )
+        Button(
+            self.ssfm,
+            text="עדכן ספרינט",
+            bd=3,
+            font=("", 15),
+            padx=1,
+            pady=1,
+            command=self.edit_sprint_frame,
+        ).grid(row=3, column=1)
+        Button(
+            self.ssfm,
+            text="משימות משויכות",
+            bd=3,
+            font=("", 15),
+            padx=1,
+            pady=1,
+            command=self.tasks_assign_sprint,
+        ).grid(row=4, column=1)
+
+        Button(
+            self.ssfm,
+            text="חזור",
+            bd=3,
+            font=("", 15),
+            padx=1,
+            pady=1,
+            command=self.sprints_frame,
+        ).grid(row=5, column=2)
+
+
+        self.ssfm.pack()
+
+    def tasks_assign_sprint(self):
+        self.ssfm.forget()
+        self.ssfm.forget()
+        self.atts.forget()
+        self.dtfs.forget()
+
+        tasks = TASK_SPRINT.get_sprint_tasks(self.prjNum.get(), self.sprintNum.get())
+
+        Label(self.tas, text="משימות המשויכות לספרינט", font=("", 20), pady=10, padx=10).grid(row=8, column=1)
+
+        Label(self.tas, text="מזהה משימה", font=("", 20, 'underline'), pady=10, padx=10).grid(row=9, column=2)
+        Label(self.tas, text="תאור", font=("", 20, 'underline'), pady=10, padx=10).grid(row=9, column=1)
+
+        i = 10
+        for t in tasks:
+            Label(self.tas, text="   " + t[0] + "   ", font=("", 20), pady=10, padx=10).grid(row=i, column=2)
+            Label(self.tas, text="   " + t[3] + "   ", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
+            i = i + 1
+
+        Label(self.tas, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=2)
+        Label(self.tas, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
+
+        i = i + 1
+
+        Label(self.tas, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
+        Label(self.tas, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=0)
+        i = i + 1
+        Button(
+            self.tas,
+            text="הוסף משימה לספרינט",
+            bd=3,
+            font=("", 15),
+            padx=1,
+            pady=1,
+            command=self.add_task_to_sprint,
+        ).grid(row=2, column=2)
+        Button(
+            self.tas,
+            text="הסרת משימה מהספרינט",
+            bd=3,
+            font=("", 15),
+            padx=1,
+            pady=1,
+            command=self.delete_task_from_sprint,
+        ).grid(row=3, column=2)
+
+        Button(
+            self.tas,
+            text="חזור",
+            bd=3,
+            font=("", 15),
+            padx=1,
+            pady=1,
+            command=self.show_sprint_frame_main,
+        ).grid(row=4, column=2)
+        self.tas.pack()
+
+    def add_task_to_sprint(self):
+        self.ssfm.forget()
+        self.tas.forget()
+        tasks = TASK.get_tasks(self.prjNum.get())
+        print(tasks)
+
+        def addTask():
+            for t in tasks:
+                if t[1] == self.taskId.get():
+                    self.description.set(t[6])
+            TASK_SPRINT.addTask(self.taskId.get(), self.prjNum.get(), self.sprintNum.get(), self.description.get())
+
+        Label(self.atts, text="משימות הקיימות בפרויקט", font=("", 20), pady=10, padx=10).grid(row=8, column=1)
+
+        Label(self.atts, text="מזהה משימה", font=("", 20, 'underline'), pady=10, padx=10).grid(row=9, column=2)
+        Label(self.atts, text="תיאור", font=("", 20, 'underline'), pady=10, padx=10).grid(row=9, column=1)
+
+        i = 10
+        for t in tasks:
+            Label(self.atts, text="   " + t[1] + "   ", font=("", 20), pady=10, padx=10).grid(row=i, column=2)
+            Label(self.atts, text="   " + t[6] + "   ", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
+            i = i + 1
+
+        Label(self.atts, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=2)
+        Label(self.atts, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
+
+        i = i + 1
+
+        Label(self.atts, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
+        Label(self.atts, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=0)
+        i = i + 1
+
+        Label(self.atts, text="מזהה של משימה:", font=("", 20), pady=10, padx=10).grid(row=i, column=2)
+
+        Entry(self.atts, textvariable=self.taskId, bd=5, font=("", 15)).grid(
+            row=i, column=1
+        )
+        i = i + 1
+        Button(
+            self.atts,
+            text="הוסף משימה",
+            bd=3,
+            font=("", 15),
+            padx=1,
+            pady=1,
+            command=addTask,
+        ).grid(row=i, column=2)
+        i = i + 1
+        Button(
+            self.atts,
+            text="חזור",
+            bd=3,
+            font=("", 15),
+            padx=1,
+            pady=1,
+            command=self.tasks_assign_sprint,
+        ).grid(row=i, column=2)
+        self.atts.pack()
+
+    def delete_task_from_sprint(self):
+        self.tas.forget()
+
+        def remove():
+            TASK_SPRINT.deleteTask(self.taskId.get(), self.prjNum.get(), self.sprintNum.get())
+            self.tasks_assign_sprint()
+
+        self.head["text"] = "הסרת משימה"
+        Label(self.dtfs, text="מספר מזהה של משימה: ", font=("", 20), pady=10, padx=10).grid(
+            row=0, column=1
+        )
+        Entry(self.dtfs, textvariable=self.taskId, bd=5, font=("", 15)).grid(
+            row=0, column=0
+        )
+        Button(
+            self.dtfs,
+            text="הסרת משימה",
+            bd=3,
+            font=("", 15),
+            padx=1,
+            pady=1,
+            command=remove,
+        ).grid(row=1, column=2)
+        Button(
+            self.dtfs,
+            text="חזור",
+            bd=3,
+            font=("", 15),
+            padx=1,
+            pady=1,
+            command=self.tasks_assign_sprint,
+        ).grid(row=2, column=2)
+        self.dtfs.pack()
+
+    def message_to_manager(self):
+        def back():
+            self.dspf.forget()
+            self.d_project_frame()
+
+        def send():  #####################
+            x = users.cursor(buffered=True).execute("select managerId from projects where projId=%s",
+                                                    (self.prjNum.get(),))
+            print(x)
+            MESSAGE.new_message_cus(self.username, x, self.messageTo)
+
+        self.dpf.forget()
+        self.head["text"] = "שליחת הודעה למנהל הפרויקט"
+
+        Label(self.dspf, text="הודעה:: ", font=("", 20), pady=10, padx=10).grid(
+            row=0, column=1
+        )
+        Entry(self.dspf, textvariable=self.messageTo, bd=5, font=("", 15)).grid(
+            row=0, column=0
+        )
+        Button(
+            self.dspf,
+            text="שלח",
+            bd=3,
+            font=("", 15),
+            padx=1,
+            pady=1,
+            command=send, ).grid(row=2, column=1)
+
+        Button(
+            self.dspf,
+            text="חזור",
+            bd=3,
+            font=("", 15),
+            padx=1,
+            pady=1,
+            command=back, ).grid(row=3, column=1)
+
+        self.dspf.pack()
 
     ###########task editor##############
 
