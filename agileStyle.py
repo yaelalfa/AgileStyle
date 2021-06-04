@@ -1362,6 +1362,7 @@ class main:
     def schema_dev(self):
         self.df.pack_forget()
         self.cf.pack_forget()
+        self.dpef.forget()
         self.head["text"] = "סכימת התקדמות"
         ########
         projectAssign = PROJECT_CREW.get_project(self.username.get())
@@ -1430,29 +1431,38 @@ class main:
         self.scc.pack()
 
     def schema(self, f):
-        projectAssign = PROJECT_CREW.get_project(self.username.get())
-
+        projectAssign = PROJECT_customer.get_proj(self.username.get())
+        print(projectAssign)
         y1 = y2 = x = []
         if projectAssign is not None:
-            tasks = TASK.get_tasks(projectAssign[0])
+            tasks = TASK.get_tasks(projectAssign[0][0])
             numTasks = len(tasks)
+            q = numTasks
+
             for t in tasks:
-                if t[0] == projectAssign[0]:
-                    if t[4] == 'DEF' or t[4] == 'DEFF':
+                if t[0] == projectAssign[0][0]:
+                    if t[4] != 'DEF' and t[4] != 'DEFF':
+                        print(t[4])
                         numTasks = numTasks - 1
 
-            x = [projectAssign[0]]
-            y1 = [numTasks * 10]
-            y2 = [100]
+            x = [projectAssign[0][0]]
+            y1 = [numTasks]
+            y2 = [q]
 
         print(x)
+        print(y1)
+        print(y2)
+        c = (numTasks / q) * 100
+        print(c)
         fig = plt.figure(figsize=(4, 5))
-        ax = fig.add_subplot(111)
-        plt.bar(x, y1, color='r')
-        plt.bar(x, y2, bottom=y1, color='b')
+        plt.bar(['Project'], y1, color='r')
+        plt.text(x=0, y=q+1,s='100%')
+        plt.bar(['Project'], y2, bottom=y1)
+        plt.text(x=0-0.1, y=y2[0]-1, s="completed:"+str(c)+'%')
+        plt.yticks([])
         canvas = FigureCanvasTkAgg(fig, master=self.scc)
         canvas.draw()
-        canvas.get_tk_widget().grid(row=0, column=0, ipadx=40, ipady=20)
+        canvas.get_tk_widget().grid(row=1, column=0, ipadx=40, ipady=20)
 
     ## DRAW WIDGETS ##
     def widgets(self):
@@ -1979,12 +1989,12 @@ class main:
         if not proj:
             ms.showerror("שגיאה", "הפרויקט המבוקש לא נמצא")
             return
-
+        self.scd.forget()
         self.dspf.forget()
 
         def back():
             self.dpef.forget()
-            self.dev_project_frame()
+            self.d_project_frame()
 
         Label(self.dpef, text=":שם הפרויקט ", font=("", 20), pady=10, padx=10).grid(row=1, column=1)
         Label(self.dpef, text=proj[1], font=("", 20), pady=10, padx=10).grid(row=1, column=0)
@@ -2987,7 +2997,8 @@ class main:
 
         def show():
             self.ssf.forget()
-            if not SPRINT.get_sprints_by_num(self.prjNum.get(), self.sprintNum.get()):
+
+            if not SPRINT.get_sprints_by_num(self.sprintNum.get(),self.prjNum.get()):
                 ms.showerror("שגיאה", "הספרינט המבוקש לא נמצא")
                 return
             self.show_sprint_frame_main()
@@ -3221,7 +3232,6 @@ class main:
             self.custumer_frame()
 
         def send():
-
             self.prjNum.set(PROJECT_customer.get_proj(self.username.get())[0][0])
             x = PROJECT.projectManager(self.prjNum.get())
             MESSAGE.new_message(self.username.get(), x, self.messageTo.get())
