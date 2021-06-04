@@ -1288,7 +1288,7 @@ class main:
                command=self.schema_cus,
                ).grid(row=2, column=1)
         Button(self.cusf,
-               text=" שלח הודעה למנהל הפרויקט ",
+               text=" פנייה למנהל הפרויקט ",
                bd=3,
                font=("", 15),
                padx=5,
