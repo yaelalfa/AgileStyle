@@ -1527,6 +1527,7 @@ class main:
         self.mf = Frame(self.master, padx=20, pady=30)
 
         # Customer Widgets
+        self.sst = Frame(self.master, padx=20, pady=30)
         self.cusf = Frame(self.master, padx=20, pady=30)
         self.cct=Frame(self.master, padx=20, pady=30)
         self.pf = Frame(self.master, padx=20, pady=30)  # project frame
@@ -3091,14 +3092,15 @@ class main:
         ).grid(row=3, column=2)
 
         self.ssf.pack()
+    
     def show_sprint_frame_dev(self):
-        self.sf.forget()
+        self.dpef.forget()
         self.apf.forget()
         self.ssfm.forget()
         self.head["text"] = " הצגת ספרינט למפתח"
 
         def show():
-            self.ssf.forget()
+            self.sst.forget()
 
             if not SPRINT.get_sprints_by_num(self.sprintNum.get(),self.prjNum.get()):
                 ms.showerror("שגיאה", "הספרינט המבוקש לא נמצא")
@@ -3146,15 +3148,7 @@ class main:
         Label(self.ssfm, text=t[0][3], font=("", 20), pady=10, padx=10).grid(
             row=2, column=0
         )
-        Button(
-            self.ssfm,
-            text="עדכן ספרינט",
-            bd=3,
-            font=("", 15),
-            padx=1,
-            pady=1,
-            command=self.edit_sprint_frame,
-        ).grid(row=3, column=1)
+       
         Button(
             self.ssfm,
             text="משימות משויכות",
