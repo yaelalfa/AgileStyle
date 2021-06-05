@@ -1570,6 +1570,8 @@ class main:
         self.ctf = Frame(self.master, padx=20, pady=30)  # customer task frame  ( cus_task_fram)
         self.crf = Frame(self.master, padx=20, pady=30)  # customer remark  frame
 
+        self.tasd=Frame(self.master, padx=20, pady=30)
+        self.ssfmd=Frame(self.master, padx=20, pady=30)
         self.sf = Frame(self.master, padx=20, pady=30)  # sprints frame
         self.asf = Frame(self.master, padx=20, pady=30)  # add sprint frame
         self.esf = Frame(self.master, padx=20, pady=30)  # edit sprint frame
@@ -3099,32 +3101,76 @@ class main:
         self.ssfm.forget()
         self.head["text"] = " הצגת ספרינט למפתח"
 
-        def show():
+        def showw():
             self.sst.forget()
 
             if not SPRINT.get_sprints_by_num(self.sprintNum.get(),self.prjNum.get()):
                 ms.showerror("שגיאה", "הספרינט המבוקש לא נמצא")
                 return
-            self.show_sprint_frame_main()
+            self.show_sprint_frame_main_dev()
 
-        Label(self.ssf, text=":מספר ספרינט ", font=("", 20), pady=10, padx=10).grid(row=0, column=0)
+        Label(self.sst, text=":מספר ספרינט ", font=("", 20), pady=10, padx=10).grid(row=0, column=0)
 
-        Entry(self.ssf, textvariable=self.sprintNum, bd=5, font=("", 15)).grid(row=0, column=1)
-        Button(self.ssf, text="הצג", bd=3,
+        Entry(self.sst, textvariable=self.sprintNum, bd=5, font=("", 15)).grid(row=0, column=1)
+        Button(self.sst, text="הצג", bd=3,
                font=("", 15), padx=1, pady=1,
-               command=show,
+               command=showw,
                ).grid(row=2, column=0)
         Button(
-            self.ssf,
+            self.sst,
+            text="חזור",
+            bd=3,
+            font=("", 15),
+            padx=1,
+            pady=1,
+            command=self.developer_frame,
+        ).grid(row=3, column=2)
+        self.sst.pack()
+    def show_sprint_frame_main_dev(self):
+        self.sst.forget()
+        self.tasd.forget()
+        self.head["text"] = " הצגת ספרינט מפתח"
+        t = SPRINT.get_sprints_by_num(self.sprintNum.get(), self.prjNum.get())
+        Label(self.ssfmd, text=":מספר ספרינט ", font=("", 20), pady=10, padx=10).grid(
+            row=0, column=1
+        )
+        Label(self.ssfmd, text=self.sprintNum.get(), font=("", 20), pady=10, padx=10).grid(
+            row=0, column=0
+        )
+        Label(self.ssfmd, text=":ימים ", font=("", 20), pady=10, padx=10).grid(
+            row=1, column=1
+        )
+        Label(self.ssfmd, text=t[0][2], font=("", 20), pady=10, padx=10).grid(
+            row=1, column=0
+        )
+        Label(self.ssfmd, text=":סטאטוס ", font=("", 20), pady=10, padx=10).grid(
+            row=2, column=1
+        )
+        Label(self.ssfmd, text=t[0][3], font=("", 20), pady=10, padx=10).grid(
+            row=2, column=0
+        )
+        
+        Button(
+            self.ssfmd,
+            text="משימות משויכות",
+            bd=3,
+            font=("", 15),
+            padx=1,
+            pady=1,
+            command=self.tasks_assign_sprint_dev,
+        ).grid(row=4, column=1)
+
+        Button(
+            self.ssfmd,
             text="חזור",
             bd=3,
             font=("", 15),
             padx=1,
             pady=1,
             command=self.sprints_frame,
-        ).grid(row=3, column=2)
+        ).grid(row=5, column=2)
 
-        self.ssf.pack()
+        self.ssfmd.pack()    
     def show_sprint_frame_main(self):
         self.ssf.forget()
         self.tas.forget()
@@ -3148,7 +3194,15 @@ class main:
         Label(self.ssfm, text=t[0][3], font=("", 20), pady=10, padx=10).grid(
             row=2, column=0
         )
-       
+        Button(
+            self.ssfm,
+            text="עדכן ספרינט",
+            bd=3,
+            font=("", 15),
+            padx=1,
+            pady=1,
+            command=self.edit_sprint_frame,
+        ).grid(row=3, column=1)
         Button(
             self.ssfm,
             text="משימות משויכות",
@@ -3173,7 +3227,7 @@ class main:
 
     def tasks_assign_sprint(self):
         self.ssfm.forget()
-        self.ssfm.forget()
+        self.ssfmd.forget()
         self.atts.forget()
         self.dtfs.forget()
 
@@ -3227,6 +3281,45 @@ class main:
             command=self.show_sprint_frame_main,
         ).grid(row=4, column=2)
         self.tas.pack()
+    def tasks_assign_sprint_dev(self):
+        self.ssfmd.forget()
+        self.ssfm.forget()
+        self.atts.forget()
+        self.dtfs.forget()
+
+        tasks = TASK_SPRINT.get_sprint_tasks(self.prjNum.get(), self.sprintNum.get())
+
+        Label(self.tasd, text="משימות המשויכות לספרינט", font=("", 20), pady=10, padx=10).grid(row=8, column=1)
+
+        Label(self.tasd, text="מזהה משימה", font=("", 20, 'underline'), pady=10, padx=10).grid(row=9, column=2)
+        Label(self.tasd, text="תאור", font=("", 20, 'underline'), pady=10, padx=10).grid(row=9, column=1)
+
+        i = 10
+        for t in tasks:
+            Label(self.tasd, text="   " + t[0] + "   ", font=("", 20), pady=10, padx=10).grid(row=i, column=2)
+            Label(self.tasd, text="   " + t[3] + "   ", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
+            i = i + 1
+
+        Label(self.tasd, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=2)
+        Label(self.tasd, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
+
+        i = i + 1
+
+        Label(self.tasd, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
+        Label(self.tasd, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=0)
+        i = i + 1
+        
+
+        Button(
+            self.tasd,
+            text="חזור",
+            bd=3,
+            font=("", 15),
+            padx=1,
+            pady=1,
+            command=self.show_sprint_frame_main,
+        ).grid(row=4, column=2)
+        self.tasd.pack()
 
     def add_task_to_sprint(self):
         self.ssfm.forget()
