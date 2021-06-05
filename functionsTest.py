@@ -24,8 +24,8 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(tes, 1)
 
     def test_userInproj(self):
-        t = functions.userInproj(1)
-        self.assertEqual(t, "x")
+        tes = functions.userInproj(1)
+        self.assertEqual(tes, "x")
 
 
 
