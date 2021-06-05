@@ -10,12 +10,12 @@ users = mysql.connector.connect(
 
 
 
-def insert_to_table(p,n,u):
+def insert_to_table(p,n,us):
     connect = users
     cc = connect.cursor(buffered=True)
     sql = '''INSERT INTO projects VALUES(%s,%s,%s)
      '''
-    dats_tuple = (p, n, u)
+    dats_tuple = (p, n, us)
     try:
         cc.execute(sql, dats_tuple)
         return 1
