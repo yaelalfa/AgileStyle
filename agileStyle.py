@@ -1689,11 +1689,13 @@ class main:
         i = i + 1
         Label(self.cpef, text="מזהה משימה", font=("", 20, 'underline'), pady=10, padx=10).grid(row=i, column=2)
         Label(self.cpef, text="תאור", font=("", 20, 'underline'), pady=10, padx=10).grid(row=i, column=1)
-
+        Label(self.cpef, text="סטאטוס", font=("", 20, 'underline'), pady=10, padx=10).grid(row=i, column=3)
         i = i + 1
         for t in tasks:
             Label(self.cpef, text="   " + t[1] + "   ", font=("", 20), pady=10, padx=10).grid(row=i, column=2)
+           
             Label(self.cpef, text="   " + t[6] + "   ", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
+            Label(self.cpef, text="   " + t[4] + "   ", font=("", 20), pady=10, padx=10).grid(row=i, column=3)
             i = i + 1
 
         Label(self.cpef, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=2)
