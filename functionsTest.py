@@ -8,8 +8,8 @@ class MyTestCase(unittest.TestCase):
 
     def test_insert_to_table(self):
 
-        t=functions.insert_to_table(random.randint(20,100),1,1)
-        self.assertEqual(t, 1)
+        tes = functions.insert_to_table(random.randint(20,100),1,1)
+        self.assertEqual(tes, 1)
 
     def test_projectManager(self):
         t = functions.projectManager(4)
