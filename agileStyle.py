@@ -53,13 +53,14 @@ conect = users
 
 # get a cursor to execute sql statements
 cc = conect.cursor(buffered=True)
-# sql= '''DROP TABLE project_tasks'''
-# cc.execute(sql)
+#sql= '''DROP TABLE projects'''
+#cc.execute(sql)
 # creat table
 sql = '''CREATE TABLE IF NOT EXISTS projects
     (projId VARCHAR(255) PRIMARY KEY,
         name VARCHAR(255),
-        managerId VARCHAR(255) )'''
+        managerId VARCHAR(255),
+        end DATE)'''
 cc.execute(sql)
 
 # sql = '''DROP TABLE userstory#
@@ -90,6 +91,7 @@ sql = '''CREATE TABLE IF NOT EXISTS project_crew
           PRIMARY KEY (projId,user))
           '''
 cc.execute(sql)
+
 sql = '''CREATE TABLE IF NOT EXISTS sprints 
          (
           sprintNum VARCHAR(255) NOT NULL,
@@ -153,17 +155,18 @@ conect.commit()
 
 # ************project class**********************************#
 class PROJECT:
-    def __init__(self, projId, name, us):
+    def __init__(self, projId, name, us,date):
         self.projId = projId
         self.name = name
         self.user = us  # usrename
+        self.date=date
 
     def insert_to_table(self):
         connect = users
         cc = connect.cursor(buffered=True)
-        sql = '''INSERT INTO projects VALUES(%s,%s,%s)
+        sql = '''INSERT INTO projects VALUES(%s,%s,%s,%s)
         '''
-        dats_tuple = (self.projId, self.name, self.user)
+        dats_tuple = (self.projId, self.name, self.user,self.date)
         try:
             cc.execute(sql, dats_tuple)
             ms.showinfo("פרויקט חדש נוצר בהצלחה")
@@ -989,6 +992,8 @@ class main:
         # Window
         self.master = master
         # Some Usefull variables
+
+        self.date= StringVar
         self.discriptuon = StringVar()
         self.username = StringVar()
         self.password = StringVar()
@@ -1456,9 +1461,9 @@ class main:
         print(c)
         fig = plt.figure(figsize=(4, 5))
         plt.bar(['Project'], y1, color='r')
-        plt.text(x=0, y=q+1,s='100%')
+        plt.text(x=0, y=q + 1, s='100%')
         plt.bar(['Project'], y2, bottom=y1)
-        plt.text(x=0-0.1, y=y2[0]-1, s="completed:"+str(c)+'%')
+        plt.text(x=0 - 0.1, y=y2[0] - 1, s="completed:" + str(c) + '%')
         plt.yticks([])
         canvas = FigureCanvasTkAgg(fig, master=self.scc)
         canvas.draw()
@@ -1529,7 +1534,7 @@ class main:
         # Customer Widgets
         self.sst = Frame(self.master, padx=20, pady=30)
         self.cusf = Frame(self.master, padx=20, pady=30)
-        self.cct=Frame(self.master, padx=20, pady=30)
+        self.cct = Frame(self.master, padx=20, pady=30)
         self.pf = Frame(self.master, padx=20, pady=30)  # project frame
         self.apf = Frame(self.master, padx=20, pady=30)  # add project
         self.rpf = Frame(self.master, padx=20, pady=30)  # remove project
@@ -1558,7 +1563,7 @@ class main:
         self.drtf = Frame(self.master, padx=20, pady=30)  # remove task frame
         self.dtef = Frame(self.master, padx=20, pady=30)  # developer task editor frame
         self.dshtf = Frame(self.master, padx=20, pady=30)  # developer show task frame
-        self.det=Frame(self.master, padx=20, pady=30)  # developer edit task frame
+        self.det = Frame(self.master, padx=20, pady=30)  # developer edit task frame
 
         self.drf = Frame(self.master, padx=20, pady=30)  # developer remark  frame
 
@@ -1570,8 +1575,8 @@ class main:
         self.ctf = Frame(self.master, padx=20, pady=30)  # customer task frame  ( cus_task_fram)
         self.crf = Frame(self.master, padx=20, pady=30)  # customer remark  frame
 
-        self.tasd=Frame(self.master, padx=20, pady=30)
-        self.ssfmd=Frame(self.master, padx=20, pady=30)
+        self.tasd = Frame(self.master, padx=20, pady=30)
+        self.ssfmd = Frame(self.master, padx=20, pady=30)
         self.sf = Frame(self.master, padx=20, pady=30)  # sprints frame
         self.asf = Frame(self.master, padx=20, pady=30)  # add sprint frame
         self.esf = Frame(self.master, padx=20, pady=30)  # edit sprint frame
@@ -1697,7 +1702,7 @@ class main:
         i = i + 1
         for t in tasks:
             Label(self.cpef, text="   " + t[1] + "   ", font=("", 20), pady=10, padx=10).grid(row=i, column=2)
-           
+
             Label(self.cpef, text="   " + t[6] + "   ", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
             Label(self.cpef, text="   " + t[4] + "   ", font=("", 20), pady=10, padx=10).grid(row=i, column=3)
             i = i + 1
@@ -1719,11 +1724,8 @@ class main:
             self.cct.forget()
             self.custumer_frame()
 
-    
         self.prjName.set(proj[1])
         self.prjNum.set(proj[0])
-
-        
 
         Button(self.cct, text="חזור", bd=3, font=("", 15), padx=1, pady=1, command=back, ).grid(row=6, column=1)
 
@@ -1741,16 +1743,16 @@ class main:
         Label(self.cct, text="סטאטוס", font=("", 20, 'underline'), pady=10, padx=10).grid(row=i, column=3)
         i = i + 1
         for t in tasks:
-           if t[4]=="DONE":
+            if t[4] == "DONE":
                 Label(self.cct, text="   " + t[1] + "   ", font=("", 20), pady=10, padx=10).grid(row=i, column=2)
                 Label(self.cct, text="   " + t[6] + "   ", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
                 Label(self.cct, text="   " + t[4] + "   ", font=("", 20), pady=10, padx=10).grid(row=i, column=3)
-            
+
                 i = i + 1
 
         Label(self.cct, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=2)
         Label(self.cct, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
-        self.cct.pack() 
+        self.cct.pack()
 
     def enter_discription_fram(self):
         self.head["text"] = "תיאור הפרוייקט"
@@ -2070,7 +2072,6 @@ class main:
                pady=5,
                command=self.schema_dev,
                ).grid(row=4, column=1)
-        
 
         Button(self.dpef, text="משימות", bd=3, font=("", 15), padx=1, pady=1, command=self.dev_task_frame, ).grid(row=5,
                                                                                                                   column=1)
@@ -2228,7 +2229,6 @@ class main:
         ).grid(row=2, column=0)
 
         self.dshtf.pack()
-    
 
     def dev_task_editor_frame(self):
         t = TASK.get_task(self.taskId.get(), self.prjNum.get())
@@ -2500,7 +2500,7 @@ class main:
             padx=1,
             pady=1,
             command=self.proj_editor_frame, ).grid(row=2, column=1)
-        
+
         Button(
             self.spf,
             text="",
@@ -2809,7 +2809,7 @@ class main:
 
         def add_proj():
             self.apf.forget()
-            newp = PROJECT(self.prjNum.get(), self.prjName.get(), self.username.get())
+            newp = PROJECT(self.prjNum.get(), self.prjName.get(), self.username.get(),self.date.get())
             newp.insert_to_table()
             self.project_frame()
 
@@ -2824,6 +2824,8 @@ class main:
         )
         Label(self.apf, text="שם של פרויקט: ", font=("", 20), pady=10, padx=10).grid(row=1, column=0)
         Entry(self.apf, textvariable=self.prjName, bd=5, font=("", 15)).grid(row=1, column=1)
+        Label(self.apf, text=",תאריך סיום פרויקט: ", font=("", 20), pady=10, padx=10).grid(row=2, column=0)
+        Entry(self.apf, textvariable=self.date, bd=5, font=("", 15)).grid(row=2, column=1)
 
         Button(
             self.apf,
@@ -3071,7 +3073,7 @@ class main:
         def show():
             self.ssf.forget()
 
-            if not SPRINT.get_sprints_by_num(self.sprintNum.get(),self.prjNum.get()):
+            if not SPRINT.get_sprints_by_num(self.sprintNum.get(), self.prjNum.get()):
                 ms.showerror("שגיאה", "הספרינט המבוקש לא נמצא")
                 return
             self.show_sprint_frame_main()
@@ -3094,7 +3096,7 @@ class main:
         ).grid(row=3, column=2)
 
         self.ssf.pack()
-    
+
     def show_sprint_frame_dev(self):
         self.dpef.forget()
         self.apf.forget()
@@ -3104,7 +3106,7 @@ class main:
         def showw():
             self.sst.forget()
 
-            if not SPRINT.get_sprints_by_num(self.sprintNum.get(),self.prjNum.get()):
+            if not SPRINT.get_sprints_by_num(self.sprintNum.get(), self.prjNum.get()):
                 ms.showerror("שגיאה", "הספרינט המבוקש לא נמצא")
                 return
             self.show_sprint_frame_main_dev()
@@ -3126,6 +3128,7 @@ class main:
             command=self.developer_frame,
         ).grid(row=3, column=2)
         self.sst.pack()
+
     def show_sprint_frame_main_dev(self):
         self.sst.forget()
         self.tasd.forget()
@@ -3149,7 +3152,7 @@ class main:
         Label(self.ssfmd, text=t[0][3], font=("", 20), pady=10, padx=10).grid(
             row=2, column=0
         )
-        
+
         Button(
             self.ssfmd,
             text="משימות משויכות",
@@ -3170,7 +3173,8 @@ class main:
             command=self.sprints_frame,
         ).grid(row=5, column=2)
 
-        self.ssfmd.pack()    
+        self.ssfmd.pack()
+
     def show_sprint_frame_main(self):
         self.ssf.forget()
         self.tas.forget()
@@ -3281,6 +3285,7 @@ class main:
             command=self.show_sprint_frame_main,
         ).grid(row=4, column=2)
         self.tas.pack()
+
     def tasks_assign_sprint_dev(self):
         self.ssfmd.forget()
         self.ssfm.forget()
@@ -3308,7 +3313,6 @@ class main:
         Label(self.tasd, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
         Label(self.tasd, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=0)
         i = i + 1
-        
 
         Button(
             self.tasd,
@@ -3665,14 +3669,14 @@ class main:
 
         Entry(self.det, textvariable=self.time, bd=5, font=("", 15)).grid(row=3, column=0)
         Button(self.det, text="שנה מספר שעות ", bd=3, font=("", 15), padx=1, pady=1, command=change_h, ).grid(row=3,
-                                                                                                               column=1)
+                                                                                                              column=1)
 
         Entry(self.dtef, textvariable=self.crew, bd=5, font=("", 15)).grid(row=4, column=0)
         Button(self.det, text="שנה כמות צוות", bd=3, font=("", 15), padx=1, pady=1, command=change_c, ).grid(row=4,
-                                                                                                              column=1)
+                                                                                                             column=1)
         Entry(self.det, textvariable=self.status, bd=5, font=("", 15)).grid(row=5, column=0)
         Button(self.det, text="שנה סטאטוס:", bd=3, font=("", 15), padx=1, pady=1, command=change_s, ).grid(row=5,
-                                                                                                            column=1)
+                                                                                                           column=1)
 
         Button(self.det, text="חזור", bd=3, font=("", 15), padx=1, pady=1, command=back, ).grid(row=6, column=0)
 
