@@ -20,8 +20,8 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(tes, 1)
 
     def test_new_message(self):
-        t = functions.new_message("s", "t", "test")
-        self.assertEqual(t, 1)
+        tes = functions.new_message("s", "t", "test")
+        self.assertEqual(tes, 1)
 
     def test_userInproj(self):
         t = functions.userInproj(1)
