@@ -12,8 +12,8 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(tes, 1)
 
     def test_projectManager(self):
-        t = functions.projectManager(4)
-        self.assertEqual(t,"nuri")
+        tes = functions.projectManager(4)
+        self.assertEqual(tes,"nuri")
 
     def test_insert_user(self):
         t = functions.insert_user(random.randint(20, 100), 1, "manager")
