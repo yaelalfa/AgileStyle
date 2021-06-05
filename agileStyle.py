@@ -1528,7 +1528,7 @@ class main:
 
         # Customer Widgets
         self.cusf = Frame(self.master, padx=20, pady=30)
-
+        self.cct=Frame(self.master, padx=20, pady=30)
         self.pf = Frame(self.master, padx=20, pady=30)  # project frame
         self.apf = Frame(self.master, padx=20, pady=30)  # add project
         self.rpf = Frame(self.master, padx=20, pady=30)  # remove project
@@ -1655,7 +1655,7 @@ class main:
                font=("", 15),
                padx=5,
                pady=5,
-               command=self.complete_task,
+               command=self.complited_tasks,
                ).grid(row=4, column=1)
 
         Button(self.cpef,
@@ -1702,6 +1702,51 @@ class main:
         Label(self.cpef, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
 
         self.cpef.pack()
+
+    def complited_tasks(self):
+        proj = PROJECT.get_project_by_projId(self.prjNum.get())
+        if not proj:
+            ms.showerror("שגיאה", "הפרויקט המבוקש לא נמצא")
+            return
+
+        self.cpef.forget()
+
+        def back():
+            self.cct.forget()
+            self.custumer_frame()
+
+    
+        self.prjName.set(proj[1])
+        self.prjNum.set(proj[0])
+
+        
+
+        Button(self.cct, text="חזור", bd=3, font=("", 15), padx=1, pady=1, command=back, ).grid(row=6, column=1)
+
+        tasks = TASK.get_tasks(self.prjNum.get())
+        i = 10
+
+        Label(self.cct, text="******************", font=("", 20), pady=10, padx=10).grid(row=i, column=0)
+        Label(self.cct, text="******************", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
+        Label(self.cct, text="******************", font=("", 20), pady=10, padx=10).grid(row=i, column=2)
+        i = i + 1
+        Label(self.cct, text="משימות הקיימות בפרויקט", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
+        i = i + 1
+        Label(self.cct, text="מזהה משימה", font=("", 20, 'underline'), pady=10, padx=10).grid(row=i, column=2)
+        Label(self.cct, text="תאור", font=("", 20, 'underline'), pady=10, padx=10).grid(row=i, column=1)
+        Label(self.cct, text="סטאטוס", font=("", 20, 'underline'), pady=10, padx=10).grid(row=i, column=3)
+        i = i + 1
+        for t in tasks:
+           if t[4]=="DONE":
+                Label(self.cct, text="   " + t[1] + "   ", font=("", 20), pady=10, padx=10).grid(row=i, column=2)
+                Label(self.cct, text="   " + t[6] + "   ", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
+                Label(self.cct, text="   " + t[4] + "   ", font=("", 20), pady=10, padx=10).grid(row=i, column=3)
+            
+                i = i + 1
+
+        Label(self.cct, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=2)
+        Label(self.cct, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
+        self.cct.pack() 
 
     def enter_discription_fram(self):
         self.head["text"] = "תיאור הפרוייקט"
