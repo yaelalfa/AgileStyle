@@ -53,14 +53,15 @@ conect = users
 
 # get a cursor to execute sql statements
 cc = conect.cursor(buffered=True)
-sql= '''DROP TABLE projects'''
-cc.execute(sql)
+#sql= '''DROP TABLE projects'''
+#cc.execute(sql)
 # creat table
 sql = '''CREATE TABLE IF NOT EXISTS projects
     (projId VARCHAR(255) PRIMARY KEY,
         name VARCHAR(255),
         managerId VARCHAR(255),
-        end DATE)'''
+        end VARCHAR(255)
+        )'''
 cc.execute(sql)
 
 # sql = '''DROP TABLE userstory#
@@ -1323,7 +1324,6 @@ class main:
             Label(self.cusf, text="   " + t[1] + "   ", font=("", 20), pady=10, padx=10).grid(row=i, column=0)
             Label(self.cusf, text="   " + t[0] + "    ", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
             i = i + 1
-
         self.cusf.pack()
 
     ## tasks for developer page
