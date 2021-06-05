@@ -53,8 +53,8 @@ conect = users
 
 # get a cursor to execute sql statements
 cc = conect.cursor(buffered=True)
-#sql= '''DROP TABLE projects'''
-#cc.execute(sql)
+sql= '''DROP TABLE projects'''
+cc.execute(sql)
 # creat table
 sql = '''CREATE TABLE IF NOT EXISTS projects
     (projId VARCHAR(255) PRIMARY KEY,
@@ -155,18 +155,18 @@ conect.commit()
 
 # ************project class**********************************#
 class PROJECT:
-    def __init__(self, projId, name, us,date):
+    def __init__(self, projId, name, us, end):
         self.projId = projId
         self.name = name
         self.user = us  # usrename
-        self.date=date
+        self.end=end
 
     def insert_to_table(self):
         connect = users
         cc = connect.cursor(buffered=True)
         sql = '''INSERT INTO projects VALUES(%s,%s,%s,%s)
         '''
-        dats_tuple = (self.projId, self.name, self.user,self.date)
+        dats_tuple = (self.projId, self.name, self.user,self.end)
         try:
             cc.execute(sql, dats_tuple)
             ms.showinfo("פרויקט חדש נוצר בהצלחה")
@@ -993,7 +993,7 @@ class main:
         self.master = master
         # Some Usefull variables
 
-        self.date= StringVar
+        self.end= StringVar()
         self.discriptuon = StringVar()
         self.username = StringVar()
         self.password = StringVar()
@@ -2809,7 +2809,7 @@ class main:
 
         def add_proj():
             self.apf.forget()
-            newp = PROJECT(self.prjNum.get(), self.prjName.get(), self.username.get(),self.date.get())
+            newp = PROJECT(self.prjNum.get(), self.prjName.get(), self.username.get(),self.end.get())
             newp.insert_to_table()
             self.project_frame()
 
@@ -2824,8 +2824,8 @@ class main:
         )
         Label(self.apf, text="שם של פרויקט: ", font=("", 20), pady=10, padx=10).grid(row=1, column=0)
         Entry(self.apf, textvariable=self.prjName, bd=5, font=("", 15)).grid(row=1, column=1)
-        Label(self.apf, text=",תאריך סיום פרויקט: ", font=("", 20), pady=10, padx=10).grid(row=2, column=0)
-        Entry(self.apf, textvariable=self.date, bd=5, font=("", 15)).grid(row=2, column=1)
+        Label(self.apf, text="תאריך סיום פרויקט: ", font=("", 20), pady=10, padx=10).grid(row=2, column=0)
+        Entry(self.apf, textvariable=self.end, bd=5, font=("", 15)).grid(row=2, column=1)
 
         Button(
             self.apf,
