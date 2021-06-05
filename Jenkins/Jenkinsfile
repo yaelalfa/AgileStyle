@@ -29,6 +29,7 @@ pipeline{
         }
         stage('Integration Test') {
                     steps{
+                        echo 'running integration test stage
                         sh 'mvn -s ../configuration/settings.xml -B clean test'
                     }
                     post{
@@ -43,12 +44,12 @@ pipeline{
         failure{
                 mail to:"yaelal@ac.sce.ac.il,nuransh@ac.sce.ac.il","lindahan1644@gmail.com",
                 subject: "Failed: Job",
-                body: "Failed"
+                body: "Pipeline failed ,please check the pipeline "
         }
         success{
                 mail to:"yaelal@ac.sce.ac.il,nuransh@ac.sce.ac.il","lindhana164@gmail.com",
                 subject: "Success: Job",
-                body: "Success"
+                body: " Job Success!"
         }
     } 
    
