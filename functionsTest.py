@@ -19,6 +19,14 @@ class MyTestCase(unittest.TestCase):
         t = functions.insert_user(random.randint(20, 100), 1, "manager")
         self.assertEqual(t, 1)
 
+    def test_new_message(self):
+        t = functions.new_message("s", "t", "test")
+        self.assertEqual(t, 1)
+
+    def test_userInproj(self):
+        t = functions.userInproj(1)
+        self.assertEqual(t, "x")
+
 
 
 

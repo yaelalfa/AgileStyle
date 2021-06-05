@@ -62,3 +62,42 @@ def insert_user(u,p,r):
         return -1
     connect.commit()
 
+def new_message(sender, to, message):
+    conect = users
+    cc = conect.cursor(buffered=True)
+    sql = '''INSERT INTO user_message VALUES(%s,%s,%s)
+                        '''
+    dats_tuple = (sender, to, message)
+
+    try:
+        cc.execute(sql, dats_tuple)
+        return 1
+
+    except Exception:
+        return -1
+
+    conect.commit()
+
+
+
+def userInproj(pid):
+    connect = users
+    cc = connect.cursor(buffered=True)
+
+    sql = """SELECT user
+                    FROM project_crew 
+                    where projId=%s         
+
+                                    """
+    dt = (pid,)
+    cc.execute(sql, dt)
+    user = cc.fetchone()
+
+    if not user:
+        return -1
+
+    ru = user[0]
+    return ru
+
+    connect.commit()
+
