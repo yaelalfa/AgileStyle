@@ -2044,6 +2044,14 @@ class main:
             self.dpef.forget()
             self.d_project_frame()
 
+        Button(self.dpef,
+               text=" משימות של ספרינט פעיל ",
+               bd=3,
+               font=("", 15),
+               padx=5,
+               pady=5,
+               command=self.show_sprint_frame_dev,
+               ).grid(row=8, column=1)
         Label(self.dpef, text=":שם הפרויקט ", font=("", 20), pady=10, padx=10).grid(row=1, column=1)
         Label(self.dpef, text=proj[1], font=("", 20), pady=10, padx=10).grid(row=1, column=0)
         Label(self.dpef, text=":מזהה הפרויקט ", font=("", 20), pady=10, padx=10).grid(row=2, column=1)
@@ -2059,6 +2067,7 @@ class main:
                pady=5,
                command=self.schema_dev,
                ).grid(row=4, column=1)
+        
 
         Button(self.dpef, text="משימות", bd=3, font=("", 15), padx=1, pady=1, command=self.dev_task_frame, ).grid(row=5,
                                                                                                                   column=1)
@@ -2483,6 +2492,15 @@ class main:
         Button(
             self.spf,
             text="הצג",
+            bd=3,
+            font=("", 15),
+            padx=1,
+            pady=1,
+            command=self.proj_editor_frame, ).grid(row=2, column=1)
+        
+        Button(
+            self.spf,
+            text="",
             bd=3,
             font=("", 15),
             padx=1,
@@ -3069,11 +3087,42 @@ class main:
             font=("", 15),
             padx=1,
             pady=1,
+            command=self.developer_frame,
+        ).grid(row=3, column=2)
+
+        self.ssf.pack()
+    def show_sprint_frame_dev(self):
+        self.sf.forget()
+        self.apf.forget()
+        self.ssfm.forget()
+        self.head["text"] = " הצגת ספרינט למפתח"
+
+        def show():
+            self.ssf.forget()
+
+            if not SPRINT.get_sprints_by_num(self.sprintNum.get(),self.prjNum.get()):
+                ms.showerror("שגיאה", "הספרינט המבוקש לא נמצא")
+                return
+            self.show_sprint_frame_main()
+
+        Label(self.ssf, text=":מספר ספרינט ", font=("", 20), pady=10, padx=10).grid(row=0, column=0)
+
+        Entry(self.ssf, textvariable=self.sprintNum, bd=5, font=("", 15)).grid(row=0, column=1)
+        Button(self.ssf, text="הצג", bd=3,
+               font=("", 15), padx=1, pady=1,
+               command=show,
+               ).grid(row=2, column=0)
+        Button(
+            self.ssf,
+            text="חזור",
+            bd=3,
+            font=("", 15),
+            padx=1,
+            pady=1,
             command=self.sprints_frame,
         ).grid(row=3, column=2)
 
         self.ssf.pack()
-
     def show_sprint_frame_main(self):
         self.ssf.forget()
         self.tas.forget()
