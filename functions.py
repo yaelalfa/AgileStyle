@@ -80,7 +80,7 @@ def new_message(sender, to, message):
 
 
 
-def userInproj(pid):
+def userInproj(projid):
     connect = users
     cc = connect.cursor(buffered=True)
 
@@ -89,7 +89,7 @@ def userInproj(pid):
                     where projId=%s         
 
                                     """
-    dt = (pid,)
+    dt = (projid,)
     cc.execute(sql, dt)
     user = cc.fetchone()
 
