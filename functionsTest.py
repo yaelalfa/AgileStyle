@@ -16,8 +16,8 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(tes,"nuri")
 
     def test_insert_user(self):
-        t = functions.insert_user(random.randint(20, 100), 1, "manager")
-        self.assertEqual(t, 1)
+        tes = functions.insert_user(random.randint(20, 100), 1, "manager")
+        self.assertEqual(tes, 1)
 
     def test_new_message(self):
         t = functions.new_message("s", "t", "test")
