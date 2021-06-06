@@ -1,5 +1,6 @@
 import tkinter
 from tkinter import *
+import random
 from tkinter import messagebox as ms
 import tkinter as tk
 import mysql.connector
@@ -362,6 +363,27 @@ class CREW_TASKS:
 
                                                 """
         dt = (pid, us,)
+
+        try:
+
+            cc.execute(sql, dt)
+            rows = cc.fetchall()
+            return rows
+        except Exception:
+            ms.showerror("error", "שגיאה בזמן משיכת משימות")
+
+        connect.commit()
+
+    def get_task_by_prj(pid):
+        connect = users
+        cc = connect.cursor(buffered=True)
+
+        sql = """SELECT * 
+                                        FROM developerTask
+                                        where  projectId=%s     
+
+                                                        """
+        dt = (pid, )
 
         try:
 
@@ -1471,43 +1493,27 @@ class main:
         self.dpef.forget()
         self.head["text"] = "סכימת התקדמות"
         ########
-        projectAssign = PROJECT_CREW.get_project(self.username.get())
-        ylabels = []
-        xlabels = []
-        if projectAssign != None:
-            tasks = TASK.get_tasks(projectAssign[0])
-            print(tasks)
-            crew = PROJECT_CREW.get_crew(projectAssign[0])
-            fig = Figure(figsize=(5, 5),
-                         dpi=100)
 
-            # list of squares
-            y = [i ** 2 for i in range(101)]
+        crew = PROJECT_CREW.get_crew(self.prjNum.get())
+        tasks = CREW_TASKS.get_task_by_prj(self.prjNum.get())
+        """
+        for t in tasks:
+            if t[4]=='DEF' or t[4]=='DEFF':
+        """
+        x=0
+        tas=TASK.get_tasks(self.prjNum.get())
+        fig = plt.figure(figsize=(4, 5))
+        for d in crew:
+            for t in tasks:
+                if d[1]==t[2] :
+                    x=x+random.randint(0,1)
 
-            # adding the subplot
-            plot1 = fig.add_subplot(111)
+            plt.bar([d[1]], [x])
+            x=0
 
-            # plotting the graph
-            plot1.plot(y)
-
-            # creating the Tkinter canvas
-            # containing the Matplotlib figure
-            canvas = FigureCanvasTkAgg(fig,
-                                       master=self.iframe5)
-            canvas.draw()
-
-            # placing the canvas on the Tkinter window
-            canvas.get_tk_widget().pack()
-
-            # creating the Matplotlib toolbar
-            toolbar = NavigationToolbar2Tk(canvas,
-                                           self.iframe5)
-            toolbar.update()
-
-            # placing the toolbar on the Tkinter window
-            canvas.get_tk_widget().pack()
-
-            self.iframe5.pack(expand=1, fill=X, pady=10, padx=5)
+        canvas = FigureCanvasTkAgg(fig, master=self.scd)
+        canvas.draw()
+        canvas.get_tk_widget().grid(row=1, column=0, ipadx=40, ipady=20)
         Button(
             self.scd,
             text="חזור",
