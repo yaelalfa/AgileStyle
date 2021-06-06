@@ -1564,6 +1564,7 @@ class main:
         self.dpef = Frame(self.master, padx=20, pady=30)  # developer project editor frame
         self.dtf = Frame(self.master, padx=20, pady=30)  # developer task frame
         self.datf = Frame(self.master, padx=20, pady=30)  # developer add task frame
+        self.datff = Frame(self.master, padx=20, pady=30)  # developer add task frame
         self.drtf = Frame(self.master, padx=20, pady=30)  # remove task frame
         self.dtef = Frame(self.master, padx=20, pady=30)  # developer task editor frame
         self.dshtf = Frame(self.master, padx=20, pady=30)  # developer show task frame
@@ -2139,7 +2140,7 @@ class main:
 
     def dev_add_task_frame(self):
         self.dpef.forget()
-
+        self.tf.forget()
         def back():
             self.datf.forget()
             self.dev_task_frame()
@@ -3836,7 +3837,7 @@ class main:
 
     def task_frame(self):
         self.pef.forget()
-
+        self.tf.forget()
         tasks = TASK.get_tasks(self.prjNum.get())
 
         def back():
