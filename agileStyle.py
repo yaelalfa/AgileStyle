@@ -322,6 +322,101 @@ class PROJECT:
             ms.showerror("שגיאה", "שגיאה בזמן משיכת פרויקט")
         connect.commit()
 
+    # ***********class crew_tasks*************#
+class CREW_TASKS:
+    def __init__(self, tid, pid, dev,us):
+        self.tid = tid
+        self.pid = pid
+        self.dev=dev
+        self.us = us
+
+    def insert_to_table(self):
+        conect = users
+        cc = conect.cursor(buffered=True)
+        sql = '''INSERT INTO developerTask VALUES(%s,%s,%s)
+                 '''
+        dats_tuple = (self.tid, self.pid, self.dev)
+
+        try:
+            cc.execute(sql, dats_tuple)
+            ms.showinfo("", ":עובד שוייך למשימה בהצלחה")
+            msg = "שוייכת למשימה "
+            msg += self.taskId.get()
+            msg += "בפרויקט "
+            msg += self.prjNum.get()
+            #MESSAGE.new_message(self.us, self.dev, msg)
+
+        except Exception:
+            ms.showerror("", "שגיאה! נסיון לשייך עובד למשימה נכשל")
+
+        conect.commit()
+
+    def get_tasks(cls, pid, us):
+        connect = users
+        cc = connect.cursor(buffered=True)
+
+        sql = """SELECT * 
+                                FROM developerTask
+                                where  projectId=%s 
+                                and user=%s     
+
+                                                """
+        dt = (pid, us,)
+
+        try:
+
+            cc.execute(sql, dt)
+            rows = cc.fetchall()
+            return rows
+        except Exception:
+            ms.showerror("error", "שגיאה בזמן משיכת משימות")
+
+        connect.commit()
+
+    def get_users_by_task(pid, tid):
+        connect = users
+        cc = connect.cursor(buffered=True)
+
+        sql = """SELECT * 
+                                FROM developerTask
+                                where  projectId=%s 
+                                and taskId=%s     
+
+                                                """
+        dt = (pid, tid,)
+
+        try:
+
+            cc.execute(sql, dt)
+            rows = cc.fetchall()
+            return rows
+        except Exception:
+            ms.showerror("error", "שגיאה בזמן משיכת משימות")
+
+        connect.commit()
+
+    @classmethod
+    def delet_task(cls, pid, tid, us):
+        connect = users
+        cc = connect.cursor(buffered=True)
+
+        sql = """DELETE FROM developerTask
+                            where  projectId=%s  
+                            AND taskId=%s
+                            AND user=%s
+
+                                            """
+        dt = (pid, tid, us)
+
+        try:
+
+            cc.execute(sql, dt)
+            ms.showinfo("", "משימה הוסרה בהצלחה")
+        except Exception:
+            ms.showerror("error", "שגיאה ניסיון הסרת משימה ")
+
+        connect.commit()
+
     # **************class Sprint*********************************#
 
 
@@ -1024,6 +1119,7 @@ class main:
         self.sprintTime = StringVar()
         self.sprintStatus = StringVar()
         self.messageTo = StringVar()
+        self.devName=StringVar()
 
     # Login Function
     def login(self):
@@ -1114,6 +1210,7 @@ class main:
     def login_frame(self):
         self.username.set("")
         self.password.set("")
+        self.crf.forget()
         self.crf.pack_forget()
         self.df.pack_forget()
         self.cusf.pack_forget()
@@ -1126,7 +1223,7 @@ class main:
         self.n_username.set("")
         self.n_password.set("")
         self.logf.pack_forget()
-        self.logf.pack_forget()
+        self.logf.forget()
         self.head["text"] = "יצירת משתמש"
         Label(self.crf, text="שם משתמש: ", font=("", 20), pady=10, padx=10).grid(
             sticky=W
@@ -1591,6 +1688,9 @@ class main:
         self.atts = Frame(self.master, padx=20, pady=30)  # add task to sprint frame
         self.tas = Frame(self.master, padx=20, pady=30)  # add task to sprint frame
         self.dtfs = Frame(self.master, padx=20, pady=30)  # delete task from sprint frame
+
+        self.at = Frame(self.master, padx=20, pady=30)  # assign tasks frame
+        self.atm = Frame(self.master, padx=20, pady=30)  # assign task main frame
 
     #########customer funcs########################
 
@@ -3855,6 +3955,8 @@ class main:
             row=3, column=1)
         Button(self.tf, text="מחק משימה", bd=3, font=("", 15), padx=1, pady=1, command=self.remove_task_frame, ).grid(
             row=4, column=1)
+        Button(self.tf, text="שייך משימה", bd=3, font=("", 15), padx=1, pady=1, command=self.assign_tasks, ).grid(
+            row=5, column=1)
 
         Label(self.tf, text="משימות הקיימות בפרויקט", font=("", 20), pady=10, padx=10).grid(row=8, column=1)
 
@@ -3876,6 +3978,8 @@ class main:
         Label(self.tf, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=0)
 
         self.tf.pack()
+
+
 
     def task_frame_c(self):
         self.pefc.forget()
@@ -3919,7 +4023,61 @@ class main:
 
     #########end of task editor##############
 
-    def messages(self, Widgets, r):  #### show the messages the the user have
+    def assign_tasks(self):
+        self.tf.forget()
+        self.shtf.forget()
+        self.head["text"] = "שיוך משימה למפתח"
+
+        def next():
+            c = CREW_TASKS(self.taskId.get(), self.prjNum.get(), self.devName.get(),self.username.get())
+            c.insert_to_table()
+            self.assign_tasks()
+
+        def back():
+            self.at.forget()
+            self.task_frame()
+
+        Button(self.at, text="חזור", bd=3, font=("", 15), padx=1, pady=1, command=back, ).grid(row=3, column=1)
+
+        Label(self.at, text=":מזהה של משימה ", font=("", 20), pady=10, padx=10).grid(
+            row=1, column=1
+        )
+        Entry(self.at, textvariable=self.taskId, bd=5, font=("", 15)).grid(
+            row=1, column=0
+        )
+        Label(self.at, text=":שם מפתח ", font=("", 20), pady=10, padx=10).grid(
+            row=2, column=1
+        )
+        Entry(self.at, textvariable=self.devName, bd=5, font=("", 15)).grid(
+            row=2, column=0
+        )
+        Button(
+            self.at,
+            text="שייך",
+            bd=3,
+            font=("", 15),
+            padx=1,
+            pady=1,
+            command=next,
+        ).grid(row=3, column=0)
+        crew = PROJECT_CREW.get_crew(self.prjNum.get())
+
+        Label(self.at, text="מפתחים המשוייכים לפרוייקט", font=("", 20), pady=10, padx=10).grid(row=8, column=1)
+
+        Label(self.at, text="שם מפתח ", font=("", 20, 'underline'), pady=10, padx=10).grid(row=9, column=2)
+        i = 10
+        for t in crew:
+            Label(self.at, text="   " + t[1] + "   ", font=("", 20), pady=10, padx=10).grid(row=i, column=2)
+            i = i + 1
+
+        Label(self.at, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=2)
+        Label(self.at, text="     ", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
+
+        i = i + 1
+        self.at.pack()
+
+    #### show the messages the the user have
+    def messages(self, Widgets, r):
         # width----the frame u use ( --self.df--- for example)
         # r---the row u want to print the messages
         msg = MESSAGE.get_my_mesagges(self.username.get())
