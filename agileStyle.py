@@ -1318,11 +1318,15 @@ class main:
         i = i + 1
         Label(self.cusf, text="שם הפרויקט", font=("", 20, 'underline'), pady=10, padx=10).grid(row=i, column=0)
         Label(self.cusf, text="מזהה הפרויקט", font=("", 20, 'underline'), pady=10, padx=10).grid(row=i, column=1)
+        Label(self.cusf, text="תאריך סיום", font=("", 20, 'underline'), pady=10, padx=10).grid(row=i, column=2)
+
         i = i + 1
         for p in projs:
             t = PROJECT.get_project_by_projId(p[0])
+            Label(self.cusf, text="   " + t[3] + "   ", font=("", 20), pady=10, padx=10).grid(row=i, column=2)
             Label(self.cusf, text="   " + t[1] + "   ", font=("", 20), pady=10, padx=10).grid(row=i, column=0)
             Label(self.cusf, text="   " + t[0] + "    ", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
+
             i = i + 1
         self.cusf.pack()
 
