@@ -2839,7 +2839,7 @@ class main:
             padx=1,
             pady=1,
             command=add_proj,
-        ).grid(row=2, column=1)
+        ).grid(row=4, column=1)
 
         Button(
             self.apf,
