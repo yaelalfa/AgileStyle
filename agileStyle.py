@@ -54,8 +54,8 @@ conect = users
 
 # get a cursor to execute sql statements
 cc = conect.cursor(buffered=True)
-#sql= '''DROP TABLE projects'''
-#cc.execute(sql)
+# sql= '''DROP TABLE projects'''
+# cc.execute(sql)
 # creat table
 sql = '''CREATE TABLE IF NOT EXISTS projects
     (projId VARCHAR(255) PRIMARY KEY,
@@ -161,14 +161,14 @@ class PROJECT:
         self.projId = projId
         self.name = name
         self.user = us  # usrename
-        self.end=end
+        self.end = end
 
     def insert_to_table(self):
         connect = users
         cc = connect.cursor(buffered=True)
         sql = '''INSERT INTO projects VALUES(%s,%s,%s,%s)
         '''
-        dats_tuple = (self.projId, self.name, self.user,self.end)
+        dats_tuple = (self.projId, self.name, self.user, self.end)
         try:
             cc.execute(sql, dats_tuple)
             ms.showinfo("פרויקט חדש נוצר בהצלחה")
@@ -324,11 +324,13 @@ class PROJECT:
         connect.commit()
 
     # ***********class crew_tasks*************#
+
+
 class CREW_TASKS:
-    def __init__(self, tid, pid, dev,us):
+    def __init__(self, tid, pid, dev, us):
         self.tid = tid
         self.pid = pid
-        self.dev=dev
+        self.dev = dev
         self.us = us
 
     def insert_to_table(self):
@@ -345,7 +347,7 @@ class CREW_TASKS:
             msg += self.taskId.get()
             msg += "בפרויקט "
             msg += self.prjNum.get()
-            #MESSAGE.new_message(self.us, self.dev, msg)
+            # MESSAGE.new_message(self.us, self.dev, msg)
 
         except Exception:
             ms.showerror("", "שגיאה! נסיון לשייך עובד למשימה נכשל")
@@ -383,7 +385,7 @@ class CREW_TASKS:
                                         where  projectId=%s     
 
                                                         """
-        dt = (pid, )
+        dt = (pid,)
 
         try:
 
@@ -1111,7 +1113,7 @@ class main:
         self.master = master
         # Some Usefull variables
 
-        self.end= StringVar()
+        self.end = StringVar()
         self.discriptuon = StringVar()
         self.username = StringVar()
         self.password = StringVar()
@@ -1141,7 +1143,7 @@ class main:
         self.sprintTime = StringVar()
         self.sprintStatus = StringVar()
         self.messageTo = StringVar()
-        self.devName=StringVar()
+        self.devName = StringVar()
 
     # Login Function
     def login(self):
@@ -1496,20 +1498,16 @@ class main:
 
         crew = PROJECT_CREW.get_crew(self.prjNum.get())
         tasks = CREW_TASKS.get_task_by_prj(self.prjNum.get())
-        """
-        for t in tasks:
-            if t[4]=='DEF' or t[4]=='DEFF':
-        """
-        x=0
-        tas=TASK.get_tasks(self.prjNum.get())
+        x = 0
+        tas = TASK.get_tasks(self.prjNum.get())
         fig = plt.figure(figsize=(4, 5))
         for d in crew:
             for t in tasks:
-                if d[1]==t[2] :
-                    x=x+random.randint(0,1)
+                if d[1] == t[2]:
+                    x = x + random.randint(0, 1)
 
             plt.bar([d[1]], [x])
-            x=0
+            x = 0
 
         canvas = FigureCanvasTkAgg(fig, master=self.scd)
         canvas.draw()
@@ -2247,6 +2245,7 @@ class main:
     def dev_add_task_frame(self):
         self.dpef.forget()
         self.tf.forget()
+
         def back():
             self.datf.forget()
             self.dev_task_frame()
@@ -2459,7 +2458,7 @@ class main:
 
         Entry(self.dtef, textvariable=self.description, bd=5, font=("", 15)).grid(row=10, column=0)
         Button(self.dtef, text="שנה תיאור משימה", bd=3, font=("", 15), padx=1, pady=1, command=change_d, ).grid(row=10,
-                                                                                                          column=1)
+                                                                                                                column=1)
 
         Button(self.dtef, text="חזור", bd=3, font=("", 15), padx=1, pady=1, command=back, ).grid(row=11, column=0)
 
@@ -2920,7 +2919,7 @@ class main:
 
         def add_proj():
             self.apf.forget()
-            newp = PROJECT(self.prjNum.get(), self.prjName.get(), self.username.get(),self.end.get())
+            newp = PROJECT(self.prjNum.get(), self.prjName.get(), self.username.get(), self.end.get())
             newp.insert_to_table()
             self.project_frame()
 
@@ -3892,24 +3891,37 @@ class main:
         Label(self.dtef, text=self.description.get(), font=("", 20), pady=10, padx=10).grid(
             row=5, column=0
         )
+        Label(self.dtef, text=" :מפתחים משוייכים", font=("", 20), pady=10, padx=10).grid(
+            row=6, column=1
+        )
+        c=CREW_TASKS.get_users_by_task(self.prjNum.get(),self.taskId.get())
+        dev=""
+        for t in c:
+           dev=dev+str(t[2])+"  "
+           
 
-        Entry(self.dtef, textvariable=self.time, bd=5, font=("", 15)).grid(row=7, column=0)
-        Button(self.dtef, text="שנה מספר שעות ", bd=3, font=("", 15), padx=1, pady=1, command=change_h, ).grid(row=7,
+        Label(self.dtef, text=dev, font=("", 20), pady=10, padx=10).grid(
+            row=6, column=0
+        )
+
+
+        Entry(self.dtef, textvariable=self.time, bd=5, font=("", 15)).grid(row=8, column=0)
+        Button(self.dtef, text="שנה מספר שעות ", bd=3, font=("", 15), padx=1, pady=1, command=change_h, ).grid(row=8,
                                                                                                                column=1)
 
-        Entry(self.dtef, textvariable=self.crew, bd=5, font=("", 15)).grid(row=8, column=0)
-        Button(self.dtef, text="שנה כמות צוות", bd=3, font=("", 15), padx=1, pady=1, command=change_c, ).grid(row=8,
+        Entry(self.dtef, textvariable=self.crew, bd=5, font=("", 15)).grid(row=9, column=0)
+        Button(self.dtef, text="שנה כמות צוות", bd=3, font=("", 15), padx=1, pady=1, command=change_c, ).grid(row=9,
                                                                                                               column=1)
 
-        Entry(self.dtef, textvariable=self.crew, bd=5, font=("", 15)).grid(row=9, column=0)
-        Button(self.dtef, text="שנה סטאטוס", bd=3, font=("", 15), padx=1, pady=1, command=change_s, ).grid(row=9,
+        Entry(self.dtef, textvariable=self.crew, bd=5, font=("", 15)).grid(row=10, column=0)
+        Button(self.dtef, text="שנה סטאטוס", bd=3, font=("", 15), padx=1, pady=1, command=change_s, ).grid(row=10,
                                                                                                            column=1)
 
-        Entry(self.dtef, textvariable=self.description, bd=5, font=("", 15)).grid(row=10, column=0)
-        Button(self.dtef, text="שנה תיאור משימה", bd=3, font=("", 15), padx=1, pady=1, command=change_d, ).grid(row=10,
-                                                                                                          column=1)
+        Entry(self.dtef, textvariable=self.description, bd=5, font=("", 15)).grid(row=11, column=0)
+        Button(self.dtef, text="שנה תיאור משימה", bd=3, font=("", 15), padx=1, pady=1, command=change_d, ).grid(row=11,
+                                                                                                                column=1)
 
-        Button(self.dtef, text="חזור", bd=3, font=("", 15), padx=1, pady=1, command=back, ).grid(row=11, column=0)
+        Button(self.dtef, text="חזור", bd=3, font=("", 15), padx=1, pady=1, command=back, ).grid(row=12, column=0)
 
         self.dtef.pack()
 
@@ -3985,8 +3997,6 @@ class main:
 
         self.tf.pack()
 
-
-
     def task_frame_c(self):
         self.pefc.forget()
 
@@ -4035,7 +4045,7 @@ class main:
         self.head["text"] = "שיוך משימה למפתח"
 
         def next():
-            c = CREW_TASKS(self.taskId.get(), self.prjNum.get(), self.devName.get(),self.username.get())
+            c = CREW_TASKS(self.taskId.get(), self.prjNum.get(), self.devName.get(), self.username.get())
             c.insert_to_table()
             self.assign_tasks()
 
