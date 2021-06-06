@@ -155,6 +155,8 @@ conect.commit()
 ###########################################################################################
 
 
+#####################################################
+
 # ************project class**********************************#
 class PROJECT:
     def __init__(self, projId, name, us, end):
@@ -343,11 +345,7 @@ class CREW_TASKS:
         try:
             cc.execute(sql, dats_tuple)
             ms.showinfo("", ":עובד שוייך למשימה בהצלחה")
-            msg = "שוייכת למשימה "
-            msg += self.taskId.get()
-            msg += "בפרויקט "
-            msg += self.prjNum.get()
-            # MESSAGE.new_message(self.us, self.dev, msg)
+
 
         except Exception:
             ms.showerror("", "שגיאה! נסיון לשייך עובד למשימה נכשל")
@@ -2096,6 +2094,7 @@ class main:
         i = i + 1
         for p in my_p:
             proj = PROJECT.get_project_by_projId(p[0])
+
             Label(self.dpf, text="   " + proj[1] + "   ", font=("", 20), pady=10, padx=10).grid(row=i, column=0)
             Label(self.dpf, text="   " + proj[0] + "    ", font=("", 20), pady=10, padx=10).grid(row=i, column=1)
             i = i + 1
@@ -2611,14 +2610,7 @@ class main:
             pady=1,
             command=self.proj_editor_frame, ).grid(row=2, column=1)
 
-        Button(
-            self.spf,
-            text="",
-            bd=3,
-            font=("", 15),
-            padx=1,
-            pady=1,
-            command=self.proj_editor_frame, ).grid(row=2, column=1)
+
 
         Button(
             self.spf,
@@ -4047,7 +4039,11 @@ class main:
         def next():
             c = CREW_TASKS(self.taskId.get(), self.prjNum.get(), self.devName.get(), self.username.get())
             c.insert_to_table()
-            self.assign_tasks()
+            msg = "שוייכת למשימה "
+            msg += self.taskId.get()
+            msg += "בפרויקט "
+            msg += self.prjNum.get()
+            MESSAGE.new_message(self.username.get(), self.devName.get(), msg)
 
         def back():
             self.at.forget()
