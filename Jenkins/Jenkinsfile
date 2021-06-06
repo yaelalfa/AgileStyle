@@ -47,7 +47,7 @@ pipeline{
                 body: "Pipeline failed ,please check the pipeline "
         }
         success{
-                mail to:"yaelal@ac.sce.ac.il,nuransh@ac.sce.ac.il","lindhana164@gmail.com","linoyha93@gmail"
+                mail to:"yaelal@ac.sce.ac.il,nuransh@ac.sce.ac.il","lindhana164@gmail.com","linoyha93@gmail.com"
                 subject: "Success: Job",
                 body: " Job Success!"
         }
