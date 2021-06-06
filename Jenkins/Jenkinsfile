@@ -30,13 +30,9 @@ pipeline{
         stage('Integration Test') {
                     steps{
                         echo 'running integration test stage
-                        sh 'mvn -s ../configuration/settings.xml -B clean test'
+                        sh 'python -m py_compile agileStyleTest.py'
                     }
-                    post{
-                        always{
-                            junit 'target/surefire-reports/*.xml' 
-                        }
-                    }       
+                    
         }
                     
     }      
