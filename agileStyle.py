@@ -144,7 +144,8 @@ sql = '''CREATE TABLE IF NOT EXISTS Remarks
 sql = '''CREATE TABLE IF NOT EXISTS proj_cust 
          (
           projId VARCHAR(255) NOT NULL,
-          user VARCHAR(255) NOT NULL
+          user VARCHAR(255) NOT NULL,
+          PRIMARY KEY (projId,user)
         )
           '''
 cc.execute(sql)
@@ -345,9 +346,26 @@ class CREW_TASKS:
         try:
             cc.execute(sql, dats_tuple)
             ms.showinfo("", ":עובד שוייך למשימה בהצלחה")
+            msg = "שוייכת למשימה "
+            msg += self.taskId.get()
+            msg += "בפרויקט "
+            msg += self.prjNum.get()
+            MESSAGE.new_message(self.username.get(), self.devName.get(), msg)
 
 
         except Exception:
+            sql = '''SELECT  * FROM developerTask WHERE projectId=%s 
+                                and taskId=%s  and user=%s
+                             '''
+            dats_tuple = (self.pid, self.tid, self.dev)
+            cc.execute(sql, dats_tuple)
+            rows = cc.fetchall()
+            print(rows)
+            for r in rows:
+                if r[0] == self.tid and r[1] == self.pid and r[2] == self.dev:
+                    ms.showerror(""," כבר משויך למשימה "+str(self.dev)+" שגיאה! המפתח ")
+                    return
+
             ms.showerror("", "שגיאה! נסיון לשייך עובד למשימה נכשל")
 
         conect.commit()
@@ -2610,8 +2628,6 @@ class main:
             pady=1,
             command=self.proj_editor_frame, ).grid(row=2, column=1)
 
-
-
         Button(
             self.spf,
             text="חזור",
@@ -3886,16 +3902,14 @@ class main:
         Label(self.dtef, text=" :מפתחים משוייכים", font=("", 20), pady=10, padx=10).grid(
             row=6, column=1
         )
-        c=CREW_TASKS.get_users_by_task(self.prjNum.get(),self.taskId.get())
-        dev=""
+        c = CREW_TASKS.get_users_by_task(self.prjNum.get(), self.taskId.get())
+        dev = ""
         for t in c:
-           dev=dev+str(t[2])+"  "
-           
+            dev = dev + str(t[2]) + "  "
 
         Label(self.dtef, text=dev, font=("", 20), pady=10, padx=10).grid(
             row=6, column=0
         )
-
 
         Entry(self.dtef, textvariable=self.time, bd=5, font=("", 15)).grid(row=8, column=0)
         Button(self.dtef, text="שנה מספר שעות ", bd=3, font=("", 15), padx=1, pady=1, command=change_h, ).grid(row=8,
@@ -4039,11 +4053,6 @@ class main:
         def next():
             c = CREW_TASKS(self.taskId.get(), self.prjNum.get(), self.devName.get(), self.username.get())
             c.insert_to_table()
-            msg = "שוייכת למשימה "
-            msg += self.taskId.get()
-            msg += "בפרויקט "
-            msg += self.prjNum.get()
-            MESSAGE.new_message(self.username.get(), self.devName.get(), msg)
 
         def back():
             self.at.forget()
