@@ -29,7 +29,7 @@ pipeline{
         }
         stage('Integration Test') {
                     steps{
-                        echo 'running integration test stage
+                        echo 'running integration test stage'
                         sh 'python -m py_compile agileStyleTest.py'
                     }
                     
