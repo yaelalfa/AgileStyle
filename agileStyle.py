@@ -2351,7 +2351,7 @@ class main:
                                                                                                            column=1)
 
         Entry(self.dtef, textvariable=self.description, bd=5, font=("", 15)).grid(row=10, column=0)
-        Button(self.dtef, text="שנה תיאור", bd=3, font=("", 15), padx=1, pady=1, command=change_d, ).grid(row=10,
+        Button(self.dtef, text="שנה תיאור משימה", bd=3, font=("", 15), padx=1, pady=1, command=change_d, ).grid(row=10,
                                                                                                           column=1)
 
         Button(self.dtef, text="חזור", bd=3, font=("", 15), padx=1, pady=1, command=back, ).grid(row=11, column=0)
@@ -3799,7 +3799,7 @@ class main:
                                                                                                            column=1)
 
         Entry(self.dtef, textvariable=self.description, bd=5, font=("", 15)).grid(row=10, column=0)
-        Button(self.dtef, text="שנה תיאור", bd=3, font=("", 15), padx=1, pady=1, command=change_d, ).grid(row=10,
+        Button(self.dtef, text="שנה תיאור משימה", bd=3, font=("", 15), padx=1, pady=1, command=change_d, ).grid(row=10,
                                                                                                           column=1)
 
         Button(self.dtef, text="חזור", bd=3, font=("", 15), padx=1, pady=1, command=back, ).grid(row=11, column=0)
