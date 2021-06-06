@@ -10,18 +10,21 @@ users = mysql.connector.connect(
 
 
 
-def insert_to_table(pj,n,us):
+def insert_to_table(pj,n,us,end):
     connect = users
     cc = connect.cursor(buffered=True)
-    sql = '''INSERT INTO projects VALUES(%s,%s,%s)
-     '''
-    dats_tuple = (pj, n, us)
+    sql = '''INSERT INTO projects VALUES(%s,%s,%s,%s)'''
+
+
+
+    dats_tuple = (pj, n, us,end)
     try:
         cc.execute(sql, dats_tuple)
+        connect.commit()
         return 1
     except Exception:
         return -1
-    connect.commit()
+
 
 
 
@@ -62,6 +65,9 @@ def insert_user(u,p,r):
         return -1
     connect.commit()
 
+
+
+
 def new_message(sender, to, message):
     conect = users
     cc = conect.cursor(buffered=True)
@@ -100,4 +106,66 @@ def userInproj(projid):
     return ru
 
     connect.commit()
+  ####################################################
+
+Maneger = "manager"
+Developer = "developer"
+Custumer = "customer"
+
+def new_user(username, password, role):
+
+    if role not in [Custumer, Maneger, Developer]:
+        return -1
+
+    connect = users
+    cc = connect.cursor(buffered=True)
+
+    sql = "INSERT INTO users(username, password, role) VALUES(%s,%s,%s)"
+    dt = (username, password, role)
+
+    try:
+        cc.execute(sql, dt)
+        return 1
+
+    except Exception:
+            return -1
+
+
+
+
+
+
+
+
+
+
+def login(username,password):
+
+
+    connect = users
+    cc = connect.cursor(buffered=True)
+
+    sql = "SELECT * FROM users WHERE username = %s and password = %s"
+
+    dt = (username,password)
+
+    try:
+
+        cc.execute(sql, dt)
+        user = cc.fetchone()
+        if user:
+            return user[2]
+
+        else:
+            return -1
+
+    except Exception:
+            return -1
+
+
+
+
+
+
+
 
