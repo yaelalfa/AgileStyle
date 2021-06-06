@@ -1567,7 +1567,7 @@ class main:
 
             for t in tasks:
                 if t[0] == projectAssign[0][0]:
-                    if t[4] != 'DEF' and t[4] != 'DEFF':
+                    if t[4] != 'DONE' and t[4] != 'DEFF':
                         print(t[4])
                         numTasks = numTasks - 1
 
