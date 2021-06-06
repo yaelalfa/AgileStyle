@@ -42,12 +42,12 @@ pipeline{
     }      
     post {
         failure{
-                mail to:"yaelal@ac.sce.ac.il,nuransh@ac.sce.ac.il","lindahan1644@gmail.com",
+                mail to:"yaelal@ac.sce.ac.il,nuransh@ac.sce.ac.il","lindahan1644@gmail.com","linoyha93@gmail.com"
                 subject: "Failed: Job",
                 body: "Pipeline failed ,please check the pipeline "
         }
         success{
-                mail to:"yaelal@ac.sce.ac.il,nuransh@ac.sce.ac.il","lindhana164@gmail.com",
+                mail to:"yaelal@ac.sce.ac.il,nuransh@ac.sce.ac.il","lindhana164@gmail.com","linoyha93@gmail"
                 subject: "Success: Job",
                 body: " Job Success!"
         }
